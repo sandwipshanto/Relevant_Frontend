@@ -26,14 +26,12 @@ class ApiService {
             headers: {
                 'Content-Type': 'application/json',
             },
-        });
-
-        // Request interceptor to add auth token
+        });        // Request interceptor to add auth token
         this.api.interceptors.request.use(
             (config) => {
                 const token = localStorage.getItem('token');
                 if (token) {
-                    config.headers['x-auth-token'] = token;
+                    config.headers['Authorization'] = `Bearer ${token}`;
                 }
                 return config;
             },
@@ -143,6 +141,95 @@ class ApiService {
         if (params.limit) queryParams.append('limit', params.limit.toString());
 
         const response = await this.api.get(`/api/content/saved/list?${queryParams.toString()}`);
+        return response.data;
+    }
+
+    // Additional content endpoints
+    async searchContent(query: string, page: number = 1, limit: number = 10): Promise<{ success: boolean; results: ContentWithUserData[]; pagination: Pagination }> {
+        const response = await this.api.get(`/api/content/search/${encodeURIComponent(query)}?page=${page}&limit=${limit}`);
+        return response.data;
+    }
+
+    async getContentHighlights(id: string): Promise<{ success: boolean; highlights: string[]; segments: any[] }> {
+        const response = await this.api.get(`/api/content/${id}/highlights`);
+        return response.data;
+    }
+
+    async processSubscriptions(): Promise<{ success: boolean; msg: string }> {
+        const response = await this.api.post('/api/content/process-subscriptions');
+        return response.data;
+    }
+
+    // Diagnostic endpoints
+    async testConnection(): Promise<{ success: boolean; msg: string }> {
+        const response = await this.api.get('/api/health');
+        return response.data;
+    }
+
+    async debugFeed(): Promise<any> {
+        try {
+            const response = await this.api.get('/api/content/feed/debug');
+            return response.data;
+        } catch (error) {
+            console.error('Debug feed error:', error);
+            return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+        }
+    }
+
+    async processVideo(videoId: string): Promise<{ success: boolean; msg: string }> {
+        const response = await this.api.post('/api/content/process-video', { videoId });
+        return response.data;
+    }
+
+    async getProcessingStatus(): Promise<{ success: boolean; activeJobs: number; queuedJobs: number }> {
+        const response = await this.api.get('/api/content/processing/status');
+        return response.data;
+    }
+
+    // Hierarchical interests endpoints
+    async updateHierarchicalInterests(interests: any): Promise<{ success: boolean; user: User; msg: string }> {
+        const response = await this.api.put('/api/user/interests/hierarchical', { interests });
+        return response.data;
+    }
+
+    async addInterestCategory(data: { category: string; priority: number; keywords: string[] }): Promise<{ success: boolean; user: User; msg: string }> {
+        const response = await this.api.post('/api/user/interests/category', data);
+        return response.data;
+    }
+
+    async addInterestSubcategory(data: { category: string; subcategory: string; priority: number; keywords: string[] }): Promise<{ success: boolean; user: User; msg: string }> {
+        const response = await this.api.post('/api/user/interests/subcategory', data);
+        return response.data;
+    }
+
+    async deleteInterestCategory(category: string): Promise<{ success: boolean; user: User; msg: string }> {
+        const response = await this.api.delete(`/api/user/interests/category/${encodeURIComponent(category)}`);
+        return response.data;
+    }
+
+    async deleteInterestSubcategory(category: string, subcategory: string): Promise<{ success: boolean; user: User; msg: string }> {
+        const response = await this.api.delete(`/api/user/interests/subcategory/${encodeURIComponent(category)}/${encodeURIComponent(subcategory)}`);
+        return response.data;
+    }
+
+    // Admin endpoints  
+    async getAdminJobStatus(): Promise<{ success: boolean; queueStats: any; cronStatus: any }> {
+        const response = await this.api.get('/api/admin/jobs/status');
+        return response.data;
+    }
+
+    async triggerChannelMonitoring(): Promise<{ success: boolean; msg: string }> {
+        const response = await this.api.post('/api/admin/trigger/channel-monitoring');
+        return response.data;
+    }
+
+    async getAIStats(): Promise<{ success: boolean; stats: any }> {
+        const response = await this.api.get('/api/admin/ai/stats');
+        return response.data;
+    }
+
+    async updateAIConfig(config: any): Promise<{ success: boolean; msg: string; newConfig: any }> {
+        const response = await this.api.put('/api/admin/ai/config', config);
         return response.data;
     }
 }

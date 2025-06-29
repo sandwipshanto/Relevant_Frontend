@@ -9,6 +9,10 @@ import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { FeedPage } from './pages/FeedPage';
+import { SavedContentPage } from './pages/SavedContentPage';
+import { ProfilePage } from './pages/ProfilePage';
+import { SettingsPage } from './pages/SettingsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,9 +74,7 @@ function App() {
                   <RegisterPage />
                 </AuthenticatedRoute>
               }
-            />
-
-            {/* Protected routes */}
+            />            {/* Protected routes */}
             <Route
               path="/dashboard"
               element={
@@ -88,13 +90,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AppLayout>
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                      <h1 className="text-3xl font-bold text-gray-900 mb-8">Content Feed</h1>
-                      <div className="text-center py-12">
-                        <p className="text-gray-600 mb-4">Content feed coming soon!</p>
-                        <p className="text-sm text-gray-500">This will show your personalized content recommendations.</p>
-                      </div>
-                    </div>
+                    <FeedPage />
                   </AppLayout>
                 </ProtectedRoute>
               }
@@ -104,13 +100,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AppLayout>
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                      <h1 className="text-3xl font-bold text-gray-900 mb-8">Saved Content</h1>
-                      <div className="text-center py-12">
-                        <p className="text-gray-600 mb-4">Saved content coming soon!</p>
-                        <p className="text-sm text-gray-500">This will show your saved articles and videos.</p>
-                      </div>
-                    </div>
+                    <SavedContentPage />
                   </AppLayout>
                 </ProtectedRoute>
               }
@@ -120,13 +110,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AppLayout>
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                      <h1 className="text-3xl font-bold text-gray-900 mb-8">Profile Management</h1>
-                      <div className="text-center py-12">
-                        <p className="text-gray-600 mb-4">Profile management coming soon!</p>
-                        <p className="text-sm text-gray-500">This will let you manage interests, YouTube sources, and preferences.</p>
-                      </div>
-                    </div>
+                    <ProfilePage />
                   </AppLayout>
                 </ProtectedRoute>
               }
@@ -136,13 +120,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <AppLayout>
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                      <h1 className="text-3xl font-bold text-gray-900 mb-8">Settings</h1>
-                      <div className="text-center py-12">
-                        <p className="text-gray-600 mb-4">Settings coming soon!</p>
-                        <p className="text-sm text-gray-500">This will contain account and app settings.</p>
-                      </div>
-                    </div>
+                    <SettingsPage />
                   </AppLayout>
                 </ProtectedRoute>
               }

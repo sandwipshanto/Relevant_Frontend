@@ -10,7 +10,7 @@ export interface User {
     _id: string;
     email: string;
     name: string;
-    interests: string[];
+    interests: HierarchicalInterests | string[];
     youtubeSources: YouTubeSource[];
     preferences: UserPreferences;
     lastActive: string;
@@ -19,15 +19,45 @@ export interface User {
 
 export interface YouTubeSource {
     channelId: string;
-    channelName: string;
+    channelTitle: string;
     channelUrl?: string;
     addedAt: string;
 }
 
 export interface UserPreferences {
-    contentFrequency: 'realtime' | 'daily' | 'weekly';
-    maxContentPerDay: number;
-    relevanceThreshold: number;
+    emailNotifications: boolean;
+    contentLanguage: string;
+    feedFrequency: 'daily' | 'weekly' | 'realtime';
+    contentFrequency?: 'realtime' | 'daily' | 'weekly';
+    maxContentPerDay?: number;
+    relevanceThreshold?: number;
+}
+
+// Hierarchical Interests Types
+export interface HierarchicalInterests {
+    [category: string]: {
+        priority: number;
+        subcategories?: {
+            [subcategory: string]: {
+                priority: number;
+                keywords: string[];
+            };
+        };
+        keywords: string[];
+    };
+}
+
+export interface InterestCategory {
+    category: string;
+    priority: number;
+    keywords: string[];
+}
+
+export interface InterestSubcategory {
+    category: string;
+    subcategory: string;
+    priority: number;
+    keywords: string[];
 }
 
 export interface UserStats {
@@ -88,6 +118,28 @@ export interface Pagination {
     hasMore: boolean;
 }
 
+// Additional Content Types
+export interface ContentHighlights {
+    highlights: string[];
+    segments: Array<{
+        timestamp: number;
+        text: string;
+        relevance: number;
+    }>;
+}
+
+export interface SearchResults {
+    results: ContentWithUserData[];
+    pagination: Pagination;
+    query: string;
+}
+
+export interface ProcessingStatus {
+    activeJobs: number;
+    queuedJobs: number;
+    lastUpdate: string;
+}
+
 // Form Types
 export interface LoginForm {
     email: string;
@@ -101,19 +153,19 @@ export interface RegisterForm {
 }
 
 export interface InterestsForm {
-    interests: string[];
+    interests: HierarchicalInterests;
 }
 
 export interface YouTubeChannelForm {
     channelId: string;
-    channelName: string;
+    channelTitle: string;
     channelUrl?: string;
 }
 
 export interface PreferencesForm {
-    contentFrequency: 'realtime' | 'daily' | 'weekly';
-    maxContentPerDay: number;
-    relevanceThreshold: number;
+    emailNotifications: boolean;
+    contentLanguage: string;
+    feedFrequency: 'daily' | 'weekly' | 'realtime';
 }
 
 // Auth Types
