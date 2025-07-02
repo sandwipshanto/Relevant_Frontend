@@ -13,6 +13,7 @@ import { FeedPage } from './pages/FeedPage';
 import { SavedContentPage } from './pages/SavedContentPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SettingsPage } from './pages/SettingsPage';
+import { YouTubeCallbackPage } from './pages/YouTubeCallbackPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -74,7 +75,15 @@ function App() {
                   <RegisterPage />
                 </AuthenticatedRoute>
               }
-            />            {/* Protected routes */}
+            />
+
+            {/* OAuth callback route */}
+            <Route
+              path="/auth/youtube/callback"
+              element={<YouTubeCallbackPage />}
+            />
+
+            {/* Protected routes */}
             <Route
               path="/dashboard"
               element={
@@ -121,6 +130,16 @@ function App() {
                 <ProtectedRoute>
                   <AppLayout>
                     <SettingsPage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/youtube-callback"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <YouTubeCallbackPage />
                   </AppLayout>
                 </ProtectedRoute>
               }

@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card'
 import { Button } from '../components/ui/Button';
 import { LoadingSpinner } from '../components/ui/Loading';
 import { ErrorBoundary } from '../components/ErrorBoundary';
+import { YouTubeOAuthSection } from '../components/YouTubeOAuthSection';
 import type { PreferencesForm } from '../types';
 
 export const SettingsPage: React.FC = () => {
@@ -208,7 +209,10 @@ export const SettingsPage: React.FC = () => {
                     </CardContent>
                 </Card>
 
-                {/* Content Processing */}
+                {/* YouTube Integration */}
+                <YouTubeOAuthSection />
+
+                {/* Content Processing Status */}
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
