@@ -19,8 +19,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
     onSave,
     onDismiss,
     onView,
-    showDismiss = true,
-    compact = false
+    showDismiss = true
 }) => {
     // Validate content structure to prevent rendering issues
     if (!content || typeof content !== 'object' || !content._id || !content.title) {
@@ -49,182 +48,190 @@ export const ContentCard: React.FC<ContentCardProps> = ({
         const diffTime = Math.abs(now.getTime() - date.getTime());
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        if (diffDays === 1) return 'Yesterday';
+        if (diffDays === 1) return '1 day ago';
         if (diffDays < 7) return `${diffDays} days ago`;
         if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
-        return date.toLocaleDateString();
+        if (diffDays < 365) return `${Math.ceil(diffDays / 30)} months ago`;
+        return `${Math.ceil(diffDays / 365)} years ago`;
     };
 
-    const thumbnailSize = compact ? 'w-32 h-20' : 'w-48 h-32';
-    const titleSize = compact ? 'text-base' : 'text-lg';
-    const padding = compact ? 'p-4' : 'p-6';
-
     return (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-            <div className={`flex ${compact ? 'gap-3' : ''}`}>
-                {/* Thumbnail */}
-                <div className={`flex-shrink-0 ${thumbnailSize} relative`}>
-                    <img
-                        src={content.thumbnail}
-                        alt={content.title}
-                        className="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity"
-                        onClick={() => onView(content)}
-                    />
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group">
+            {/* Thumbnail Container */}
+            <div className="relative aspect-video bg-gray-100 overflow-hidden">
+                <img
+                    src={content.thumbnail || '/api/placeholder/320/180'}
+                    alt={content.title}
+                    className="w-full h-full object-cover cursor-pointer group-hover:scale-105 transition-transform duration-300"
+                    onClick={() => onView(content)}
+                    onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/api/placeholder/320/180';
+                    }}
+                />
 
-                    {/* Duration */}
-                    {content.duration && typeof content.duration === 'number' && (
-                        <div className="absolute bottom-1 right-1 bg-black bg-opacity-75 text-white text-xs px-1.5 py-0.5 rounded">
-                            {formatDuration(content.duration)}
-                        </div>
-                    )}
-
-                    {/* Play Icon */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer bg-black bg-opacity-20">
-                        <Play className="h-8 w-8 text-white" fill="white" />
+                {/* Duration Badge */}
+                {content.duration && typeof content.duration === 'number' && content.duration > 0 && (
+                    <div className="absolute bottom-2 right-2 bg-black bg-opacity-80 text-white text-xs px-2 py-1 rounded font-medium">
+                        {formatDuration(content.duration)}
                     </div>
+                )}
 
-                    {/* Status Badges */}
-                    <div className="absolute top-1 left-1 flex flex-col gap-1">
-                        {content.userContent?.viewed && (
-                            <div className="bg-green-500 text-white text-xs px-1.5 py-0.5 rounded">
-                                Viewed
-                            </div>
-                        )}
-                        {content.userContent?.saved && (
-                            <div className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded">
-                                Saved
-                            </div>
-                        )}
+                {/* Play Overlay */}
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="bg-white bg-opacity-90 rounded-full p-3 cursor-pointer transform scale-90 group-hover:scale-100 transition-transform duration-200">
+                            <Play className="h-6 w-6 text-gray-900" fill="currentColor" />
+                        </div>
                     </div>
                 </div>
 
-                {/* Content */}
-                <div className={`flex-1 ${padding}`}>
-                    <div className="flex justify-between items-start mb-2">
-                        <h3
-                            className={`${titleSize} font-semibold text-gray-900 cursor-pointer hover:text-blue-600 line-clamp-2 leading-snug`}
-                            onClick={() => onView(content)}
+                {/* Status Badges */}
+                <div className="absolute top-2 left-2 flex flex-col gap-1">
+                    {content.userContent?.viewed && (
+                        <div className="bg-emerald-500 text-white text-xs px-2 py-0.5 rounded-full font-medium shadow-sm">
+                            ✓ Watched
+                        </div>
+                    )}
+                    {content.userContent?.saved && (
+                        <div className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-medium shadow-sm">
+                            ★ Saved
+                        </div>
+                    )}
+                </div>
+
+                {/* Dismiss Button */}
+                {showDismiss && onDismiss && (
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <Button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onDismiss(content._id);
+                            }}
+                            variant="ghost"
+                            size="sm"
+                            className="bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full p-1 h-8 w-8"
                         >
-                            {content.title}
-                        </h3>
-                        {showDismiss && onDismiss && (
-                            <Button
-                                onClick={() => onDismiss(content._id)}
-                                variant="ghost"
-                                size="sm"
-                                className="text-gray-400 hover:text-gray-600 flex-shrink-0 ml-2"
-                            >
-                                <X className="h-4 w-4" />
-                            </Button>
-                        )}
+                            <X className="h-4 w-4" />
+                        </Button>
                     </div>
+                )}
+            </div>
 
-                    {/* Meta Info */}
-                    <div className="flex items-center gap-3 text-sm text-gray-600 mb-3">
-                        <div className="flex items-center gap-1">
-                            <User className="h-4 w-4" />
-                            <span className="truncate">
-                                {content.sourceChannel?.name || 'Unknown Source'}
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            {content.publishedAt ? formatDate(content.publishedAt) : 'Unknown Date'}
-                        </div>
-                        {content.userContent?.relevanceScore && typeof content.userContent.relevanceScore === 'number' && (
-                            <div className="flex items-center gap-1">
-                                <Tag className="h-4 w-4" />
-                                <span className="font-medium">
-                                    {Math.round(content.userContent.relevanceScore * 100)}% match
-                                </span>
-                            </div>
-                        )}
+            {/* Content Info */}
+            <div className="p-4">
+                {/* Title */}
+                <h3
+                    className="font-semibold text-gray-900 text-base leading-snug mb-2 line-clamp-2 cursor-pointer hover:text-blue-600 transition-colors duration-200"
+                    onClick={() => onView(content)}
+                >
+                    {content.title}
+                </h3>
+
+                {/* Channel & Meta Info */}
+                <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <User className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate font-medium">
+                            {content.sourceChannel?.name || 'Unknown Channel'}
+                        </span>
                     </div>
-
-                    {/* Description */}
-                    <p className={`text-gray-700 mb-4 ${compact ? 'line-clamp-2' : 'line-clamp-3'}`}>
-                        {(content.userContent?.personalizedSummary && typeof content.userContent.personalizedSummary === 'string') ?
-                            content.userContent.personalizedSummary :
-                            (content.summary && typeof content.summary === 'string') ?
-                                content.summary :
-                                (content.description && typeof content.description === 'string') ?
-                                    content.description :
-                                    'No description available'
-                        }
-                    </p>
-
-                    {/* Highlights */}
-                    {!compact && content.userContent?.personalizedHighlights && content.userContent.personalizedHighlights.length > 0 && (
-                        <div className="mb-4">
-                            <h4 className="text-sm font-medium text-gray-700 mb-2">Key Highlights:</h4>
-                            <ul className="space-y-1 text-sm text-gray-600">
-                                {content.userContent.personalizedHighlights
-                                    .filter(highlight => typeof highlight === 'string') // Ensure only strings are rendered
-                                    .slice(0, 2)
-                                    .map((highlight, index) => (
-                                        <li key={index} className="flex items-start">
-                                            <span className="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 mr-2 flex-shrink-0" />
-                                            <span className="line-clamp-1">{highlight}</span>
-                                        </li>
-                                    ))}
-                            </ul>
+                    {content.userContent?.relevanceScore && typeof content.userContent.relevanceScore === 'number' && (
+                        <div className="flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                            <Tag className="h-3 w-3" />
+                            {Math.round(content.userContent.relevanceScore * 100)}%
                         </div>
                     )}
+                </div>
 
-                    {/* Matched Interests */}
-                    {content.userContent?.matchedInterests && content.userContent.matchedInterests.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mb-4">
-                            {content.userContent.matchedInterests
-                                .filter(interest => typeof interest === 'string') // Ensure only strings are rendered
-                                .slice(0, compact ? 2 : 3)
-                                .map((interest, index) => (
-                                    <span
-                                        key={index}
-                                        className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                                    >
-                                        {interest}
-                                    </span>
+                {/* Views and Date */}
+                <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                    <Clock className="h-4 w-4" />
+                    <span>{content.publishedAt ? formatDate(content.publishedAt) : 'Unknown date'}</span>
+                </div>
+
+                {/* Description */}
+                <p className="text-gray-700 text-sm line-clamp-2 leading-relaxed mb-3">
+                    {(content.userContent?.personalizedSummary && typeof content.userContent.personalizedSummary === 'string') ?
+                        content.userContent.personalizedSummary :
+                        (content.summary && typeof content.summary === 'string') ?
+                            content.summary :
+                            (content.description && typeof content.description === 'string') ?
+                                content.description :
+                                'No description available'
+                    }
+                </p>
+
+                {/* Highlights */}
+                {content.userContent?.personalizedHighlights && content.userContent.personalizedHighlights.length > 0 && (
+                    <div className="mb-4">
+                        <div className="flex flex-wrap gap-1">
+                            {content.userContent.personalizedHighlights
+                                .filter(highlight => typeof highlight === 'string')
+                                .slice(0, 2)
+                                .map((highlight, index) => (
+                                    <div key={index} className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">
+                                        ✨ {highlight.length > 30 ? `${highlight.substring(0, 30)}...` : highlight}
+                                    </div>
                                 ))}
-                            {content.userContent.matchedInterests.filter(interest => typeof interest === 'string').length > (compact ? 2 : 3) && (
-                                <span className="text-xs text-gray-500 px-2 py-0.5">
-                                    +{content.userContent.matchedInterests.filter(interest => typeof interest === 'string').length - (compact ? 2 : 3)} more
-                                </span>
-                            )}
                         </div>
-                    )}
+                    </div>
+                )}
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-3">
+                {/* Matched Interests */}
+                {content.userContent?.matchedInterests && content.userContent.matchedInterests.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                        {content.userContent.matchedInterests
+                            .filter(interest => typeof interest === 'string')
+                            .slice(0, 3)
+                            .map((interest, index) => (
+                                <span
+                                    key={index}
+                                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700"
+                                >
+                                    {interest}
+                                </span>
+                            ))}
+                        {content.userContent.matchedInterests.filter(interest => typeof interest === 'string').length > 3 && (
+                            <span className="text-xs text-gray-500 px-2 py-1">
+                                +{content.userContent.matchedInterests.filter(interest => typeof interest === 'string').length - 3} more
+                            </span>
+                        )}
+                    </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                    <div className="flex items-center gap-2">
                         <Button
                             onClick={() => onLike(content._id, !content.userContent?.liked)}
                             variant="ghost"
                             size="sm"
-                            className={`${content.userContent?.liked ? 'text-red-600' : 'text-gray-600'} hover:bg-red-50`}
+                            className={`${content.userContent?.liked ? 'text-red-600 bg-red-50' : 'text-gray-600 hover:bg-red-50 hover:text-red-600'} transition-colors duration-200`}
                         >
                             <Heart className={`h-4 w-4 mr-1 ${content.userContent?.liked ? 'fill-current' : ''}`} />
-                            {content.userContent?.liked ? 'Liked' : 'Like'}
+                            <span className="text-xs">{content.userContent?.liked ? 'Liked' : 'Like'}</span>
                         </Button>
 
                         <Button
                             onClick={() => onSave(content._id, !content.userContent?.saved)}
                             variant="ghost"
                             size="sm"
-                            className={`${content.userContent?.saved ? 'text-blue-600' : 'text-gray-600'} hover:bg-blue-50`}
+                            className={`${content.userContent?.saved ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'} transition-colors duration-200`}
                         >
                             <Bookmark className={`h-4 w-4 mr-1 ${content.userContent?.saved ? 'fill-current' : ''}`} />
-                            {content.userContent?.saved ? 'Saved' : 'Save'}
-                        </Button>
-
-                        <Button
-                            onClick={() => onView(content)}
-                            variant="ghost"
-                            size="sm"
-                            className="text-gray-600 hover:bg-gray-50"
-                        >
-                            <ExternalLink className="h-4 w-4 mr-1" />
-                            Open
+                            <span className="text-xs">{content.userContent?.saved ? 'Saved' : 'Save'}</span>
                         </Button>
                     </div>
+
+                    <Button
+                        onClick={() => onView(content)}
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors duration-200"
+                    >
+                        <ExternalLink className="h-4 w-4 mr-1" />
+                        <span className="text-xs">Watch</span>
+                    </Button>
                 </div>
             </div>
         </div>
