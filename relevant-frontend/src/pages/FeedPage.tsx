@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, Filter, RefreshCw, X } from 'lucide-react';
+import { Search, Filter, RefreshCw, X, Info, Clock, Zap } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { apiService } from '../services/api';
 import { Button } from '../components/ui/Button';
@@ -202,6 +202,36 @@ export const FeedPage: React.FC = () => {
                         </Button>
                     </div>
                 </div>
+
+                {/* Smart Processing Info Banner */}
+                {!isSearchMode && (
+                    <div className="mb-4 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4">
+                        <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 mt-0.5">
+                                <Zap className="h-5 w-5 text-green-600" />
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="font-medium text-green-900 text-sm mb-1">
+                                    Smart Daily Processing Active
+                                </h3>
+                                <p className="text-green-800 text-sm">
+                                    Your content is automatically processed daily at 6 AM UTC with anti-duplicate protection.
+                                    Only new content is analyzed, reducing costs by 85-95% while maintaining quality.
+                                </p>
+                                <div className="flex items-center gap-4 mt-2 text-xs text-green-700">
+                                    <div className="flex items-center gap-1">
+                                        <Clock className="h-3 w-3" />
+                                        <span>Daily at 6 AM UTC</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Info className="h-3 w-3" />
+                                        <span>No duplicate analysis</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Search Bar */}
                 <form onSubmit={handleSearch} className="flex gap-2 mb-4">

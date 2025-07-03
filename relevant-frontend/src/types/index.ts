@@ -15,6 +15,17 @@ export interface User {
     preferences: UserPreferences;
     lastActive: string;
     createdAt: string;
+    youtubeConnection?: YouTubeConnection;
+}
+
+export interface YouTubeConnection {
+    connected: boolean;
+    channelId?: string;
+    channelTitle?: string;
+    accessToken?: string;
+    refreshToken?: string;
+    connectedAt?: string;
+    lastSyncAt?: string;
 }
 
 export interface YouTubeSource {
@@ -192,4 +203,33 @@ export interface FeedQueryParams {
 export interface SavedContentQueryParams {
     page?: number;
     limit?: number;
+}
+
+// YouTube OAuth Types
+export interface YouTubeAuthUrlResponse {
+    success: boolean;
+    authUrl: string;
+}
+
+export interface YouTubeCallbackResponse {
+    success: boolean;
+    msg: string;
+}
+
+export interface YouTubeConnectionStatusResponse {
+    success: boolean;
+    connected: boolean;
+    channelTitle?: string;
+    channelId?: string;
+}
+
+export interface YouTubeSyncResponse {
+    success: boolean;
+    msg: string;
+    subscriptionsAdded?: number;
+}
+
+export interface YouTubeDisconnectResponse {
+    success: boolean;
+    msg: string;
 }

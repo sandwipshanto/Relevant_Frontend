@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Heart, User, Calendar, TrendingUp } from 'lucide-react';
+import { BookOpen, Heart, User, Calendar, TrendingUp, Zap, Clock, DollarSign } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -87,7 +87,7 @@ export const DashboardPage: React.FC = () => {
                                     <div className="ml-4">
                                         <p className="text-sm font-medium text-gray-600">Interests</p>
                                         <p className="text-2xl font-bold text-gray-900">
-                                            {stats?.totalInterests || user?.interests?.length || 0}
+                                            {stats?.totalInterests || (typeof user?.interests === 'object' && !Array.isArray(user?.interests) ? Object.keys(user.interests).length : Array.isArray(user?.interests) ? user.interests.length : 0)}
                                         </p>
                                     </div>
                                 </div>
@@ -167,6 +167,64 @@ export const DashboardPage: React.FC = () => {
                         </Link>
                     ))}
                 </div>
+            </div>
+
+            {/* Smart Processing Information */}
+            <div className="mb-8">
+                <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+                    <CardHeader>
+                        <CardTitle className="text-green-900 flex items-center gap-2">
+                            <Zap className="h-5 w-5" />
+                            Smart Daily Content Processing
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-green-800 mb-4">
+                            Your content is now processed more efficiently with our anti-duplicate system that runs automatically every day at 6 AM UTC.
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-100">
+                                <div className="flex-shrink-0">
+                                    <Clock className="h-5 w-5 text-green-600" />
+                                </div>
+                                <div>
+                                    <p className="font-medium text-green-900 text-sm">Daily Processing</p>
+                                    <p className="text-xs text-green-700">Only new content analyzed</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-100">
+                                <div className="flex-shrink-0">
+                                    <DollarSign className="h-5 w-5 text-green-600" />
+                                </div>
+                                <div>
+                                    <p className="font-medium text-green-900 text-sm">85-95% Cost Reduction</p>
+                                    <p className="text-xs text-green-700">Smart AI processing pipeline</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-100">
+                                <div className="flex-shrink-0">
+                                    <Zap className="h-5 w-5 text-green-600" />
+                                </div>
+                                <div>
+                                    <p className="font-medium text-green-900 text-sm">No Duplicates</p>
+                                    <p className="text-xs text-green-700">Each content analyzed once</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex gap-3">
+                            <Link to="/settings">
+                                <Button variant="secondary" className="bg-green-600 text-white hover:bg-green-700 border-green-600">
+                                    Manual Processing
+                                </Button>
+                            </Link>
+                            <Link to="/feed">
+                                <Button variant="secondary">
+                                    View Your Feed
+                                </Button>
+                            </Link>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
 
             {/* Getting Started */}

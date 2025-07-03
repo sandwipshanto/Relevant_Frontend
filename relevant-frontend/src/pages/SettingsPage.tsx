@@ -80,12 +80,24 @@ export const SettingsPage: React.FC = () => {
     const processSubscriptionsMutation = useMutation({
         mutationFn: () => apiService.processSubscriptions(),
         onSuccess: () => {
-            toast.success('Processing started! New content will be analyzed.');
+            toast.success('Full processing started! All subscriptions will be analyzed.');
             setIsProcessing(true);
             refetchStatus();
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.msg || 'Failed to start processing');
+            toast.error(error.response?.data?.msg || 'Failed to start full processing');
+        }
+    });
+
+    const processTodaysContentMutation = useMutation({
+        mutationFn: () => apiService.processTodaysContent(),
+        onSuccess: () => {
+            toast.success('Today\'s content processing started! New content will be analyzed.');
+            setIsProcessing(true);
+            refetchStatus();
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.msg || 'Failed to start today\'s content processing');
         }
     });
 
@@ -95,6 +107,10 @@ export const SettingsPage: React.FC = () => {
 
     const handleProcessSubscriptions = () => {
         processSubscriptionsMutation.mutate();
+    };
+
+    const handleProcessTodaysContent = () => {
+        processTodaysContentMutation.mutate();
     };
 
     const handlePreferenceChange = (key: keyof PreferencesForm, value: any) => {
@@ -267,32 +283,87 @@ export const SettingsPage: React.FC = () => {
                         {/* Manual Processing */}
                         <div className="space-y-4">
                             <div>
-                                <h3 className="font-medium text-gray-900 mb-2">Manual Content Processing</h3>
+                                <h3 className="font-medium text-gray-900 mb-2">Content Processing</h3>
                                 <p className="text-sm text-gray-600 mb-4">
-                                    Manually trigger processing of your YouTube subscriptions to find new relevant content.
+                                    Process your YouTube subscriptions to find new relevant content. Choose between daily processing (recommended) or full analysis.
                                 </p>
-                                <Button
-                                    onClick={handleProcessSubscriptions}
-                                    disabled={processSubscriptionsMutation.isPending || isProcessing}
-                                    variant="secondary"
-                                >
-                                    {processSubscriptionsMutation.isPending ? (
-                                        <>
-                                            <LoadingSpinner size="sm" />
-                                            <span className="ml-2">Starting...</span>
-                                        </>
-                                    ) : isProcessing ? (
-                                        <>
-                                            <Activity className="h-4 w-4 mr-2 animate-pulse" />
-                                            Processing...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <RefreshCw className="h-4 w-4 mr-2" />
-                                            Process Subscriptions
-                                        </>
-                                    )}
-                                </Button>
+
+                                {/* Daily Processing (Recommended) */}
+                                <div className="space-y-3">
+                                    <div className="border border-green-200 rounded-lg p-4 bg-green-50">
+                                        <div className="flex items-start gap-2 mb-3">
+                                            <div className="flex-shrink-0 mt-0.5">
+                                                <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-medium text-green-900 mb-1">Daily Processing (Recommended)</h4>
+                                                <p className="text-sm text-green-700 mb-3">
+                                                    Process only today's new content. Efficient and cost-effective with anti-duplicate protection.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Button
+                                            onClick={handleProcessTodaysContent}
+                                            disabled={processTodaysContentMutation.isPending || processSubscriptionsMutation.isPending || isProcessing}
+                                            variant="secondary"
+                                            className="bg-green-600 text-white hover:bg-green-700 border-green-600"
+                                        >
+                                            {processTodaysContentMutation.isPending ? (
+                                                <>
+                                                    <LoadingSpinner size="sm" />
+                                                    <span className="ml-2">Starting...</span>
+                                                </>
+                                            ) : isProcessing ? (
+                                                <>
+                                                    <Activity className="h-4 w-4 mr-2 animate-pulse" />
+                                                    Processing...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <RefreshCw className="h-4 w-4 mr-2" />
+                                                    Process Today's Content
+                                                </>
+                                            )}
+                                        </Button>
+                                    </div>
+
+                                    {/* Full Processing */}
+                                    <div className="border border-gray-200 rounded-lg p-4">
+                                        <div className="flex items-start gap-2 mb-3">
+                                            <div className="flex-shrink-0 mt-0.5">
+                                                <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-medium text-gray-900 mb-1">Full Processing</h4>
+                                                <p className="text-sm text-gray-600 mb-3">
+                                                    Process all content from subscriptions. Use only when needed (e.g., first setup, debugging).
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Button
+                                            onClick={handleProcessSubscriptions}
+                                            disabled={processSubscriptionsMutation.isPending || processTodaysContentMutation.isPending || isProcessing}
+                                            variant="secondary"
+                                        >
+                                            {processSubscriptionsMutation.isPending ? (
+                                                <>
+                                                    <LoadingSpinner size="sm" />
+                                                    <span className="ml-2">Starting...</span>
+                                                </>
+                                            ) : isProcessing ? (
+                                                <>
+                                                    <Activity className="h-4 w-4 mr-2 animate-pulse" />
+                                                    Processing...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <RefreshCw className="h-4 w-4 mr-2" />
+                                                    Full Processing
+                                                </>
+                                            )}
+                                        </Button>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Processing Info */}
@@ -302,13 +373,14 @@ export const SettingsPage: React.FC = () => {
                                     <div className="text-sm text-blue-800">
                                         <h4 className="font-medium mb-1">How Content Processing Works</h4>
                                         <ul className="space-y-1 text-blue-700">
-                                            <li>• Fetches latest videos from your YouTube channels</li>
-                                            <li>• Analyzes content relevance using AI</li>
-                                            <li>• Filters content based on your interests</li>
-                                            <li>• Updates your personalized feed</li>
+                                            <li>• <strong>Daily Processing:</strong> Analyzes only new content published today (prevents duplicates)</li>
+                                            <li>• <strong>Smart Filtering:</strong> Uses AI to analyze content relevance efficiently</li>
+                                            <li>• <strong>Cost Optimization:</strong> Multi-stage analysis minimizes AI costs by 85-95%</li>
+                                            <li>• <strong>Interest Matching:</strong> Filters content based on your interests and keywords</li>
+                                            <li>• <strong>Real-time Updates:</strong> Updates your personalized feed with relevant content</li>
                                         </ul>
-                                        <p className="mt-2 text-xs">
-                                            Processing typically takes 2-5 minutes depending on the number of channels.
+                                        <p className="mt-2 text-xs text-blue-600">
+                                            💡 <strong>Tip:</strong> Use "Daily Processing" for regular updates. It automatically runs at 6 AM UTC daily and only processes new content.
                                         </p>
                                     </div>
                                 </div>

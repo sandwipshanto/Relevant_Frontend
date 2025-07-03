@@ -14,7 +14,12 @@ import type {
     YouTubeChannelForm,
     PreferencesForm,
     FeedQueryParams,
-    SavedContentQueryParams
+    SavedContentQueryParams,
+    YouTubeAuthUrlResponse,
+    YouTubeCallbackResponse,
+    YouTubeConnectionStatusResponse,
+    YouTubeSyncResponse,
+    YouTubeDisconnectResponse
 } from '../types';
 
 class ApiService {
@@ -160,6 +165,11 @@ class ApiService {
         return response.data;
     }
 
+    async processTodaysContent(): Promise<{ success: boolean; msg: string }> {
+        const response = await this.api.post('/api/content/process-today');
+        return response.data;
+    }
+
     // Diagnostic endpoints
     async testConnection(): Promise<{ success: boolean; msg: string }> {
         const response = await this.api.get('/api/health');
@@ -230,6 +240,32 @@ class ApiService {
 
     async updateAIConfig(config: any): Promise<{ success: boolean; msg: string; newConfig: any }> {
         const response = await this.api.put('/api/admin/ai/config', config);
+        return response.data;
+    }
+
+    // YouTube OAuth endpoints
+    async getYouTubeAuthUrl(): Promise<YouTubeAuthUrlResponse> {
+        const response = await this.api.get('/api/oauth/youtube/auth-url');
+        return response.data;
+    }
+
+    async handleYouTubeCallback(code: string): Promise<YouTubeCallbackResponse> {
+        const response = await this.api.post('/api/oauth/youtube/callback', { code });
+        return response.data;
+    }
+
+    async getYouTubeConnectionStatus(): Promise<YouTubeConnectionStatusResponse> {
+        const response = await this.api.get('/api/oauth/youtube/status');
+        return response.data;
+    }
+
+    async syncYouTubeSubscriptions(): Promise<YouTubeSyncResponse> {
+        const response = await this.api.post('/api/oauth/youtube/sync-subscriptions');
+        return response.data;
+    }
+
+    async disconnectYouTube(): Promise<YouTubeDisconnectResponse> {
+        const response = await this.api.delete('/api/oauth/youtube/disconnect');
         return response.data;
     }
 }
