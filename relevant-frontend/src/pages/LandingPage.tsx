@@ -37,7 +37,7 @@ export const LandingPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
             {/* Animated Background */}
-            <div className="absolute inset-0 opacity-20">
+            <div className="absolute inset-0 opacity-20 -z-10">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20"></div>
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,theme(colors.purple.500/0.1),transparent_50%)]"></div>
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,theme(colors.pink.500/0.1),transparent_50%)]"></div>
@@ -46,8 +46,8 @@ export const LandingPage: React.FC = () => {
             {/* Hero Section */}
             <div className="relative isolate px-6 pt-14 lg:px-8">
                 {/* Gradient Orbs */}
-                <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full filter blur-3xl opacity-20 animate-pulse"></div>
-                <div className="absolute top-40 right-10 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl opacity-20 animate-pulse delay-1000"></div>
+                <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full filter blur-3xl opacity-20 animate-pulse -z-10"></div>
+                <div className="absolute top-40 right-10 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl opacity-20 animate-pulse delay-1000 -z-10"></div>
 
                 <div className="mx-auto max-w-4xl py-32 sm:py-48 lg:py-56">
                     <div className="text-center">

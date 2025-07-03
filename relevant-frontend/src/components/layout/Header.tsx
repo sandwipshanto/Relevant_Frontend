@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogOut, Settings, BookOpen, Home, Heart } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../ui/Button';
@@ -8,6 +8,7 @@ export const Header: React.FC = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { user, logout, isAuthenticated } = useAuth();
     const location = useLocation();
+    const navigate = useNavigate();
 
     const navigation = [
         { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -18,8 +19,12 @@ export const Header: React.FC = () => {
 
     const isActive = (path: string) => location.pathname === path;
 
+    const handleNavClick = (href: string) => {
+        navigate(href);
+    };
+
     return (
-        <header className="bg-white shadow-sm border-b">
+        <header className="bg-white shadow-sm border-b relative z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
                     <div className="flex items-center">
@@ -33,23 +38,22 @@ export const Header: React.FC = () => {
 
                     {/* Desktop Navigation */}
                     {isAuthenticated && (
-                        <nav className="hidden md:flex space-x-8">
-                            {navigation.map((item) => {
-                                const Icon = item.icon;
-                                return (
-                                    <Link
-                                        key={item.name}
-                                        to={item.href}
-                                        className={`inline-flex items-center px-1 pt-1 text-sm font-medium border-b-2 transition-colors ${isActive(item.href)
-                                                ? 'border-primary-500 text-primary-600'
-                                                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                                            }`}
-                                    >
-                                        <Icon size={16} className="mr-2" />
-                                        {item.name}
-                                    </Link>
-                                );
-                            })}
+                        <nav className="hidden md:flex space-x-8">                        {navigation.map((item) => {
+                            const Icon = item.icon;
+                            return (
+                                <button
+                                    key={item.name}
+                                    onClick={() => handleNavClick(item.href)}
+                                    className={`inline-flex items-center px-1 pt-1 text-sm font-medium border-b-2 transition-colors cursor-pointer ${isActive(item.href)
+                                            ? 'border-primary-500 text-primary-600'
+                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                        }`}
+                                >
+                                    <Icon size={16} className="mr-2" />
+                                    {item.name}
+                                </button>
+                            );
+                        })}
                         </nav>
                     )}
 
