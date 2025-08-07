@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Heart, User, Calendar, TrendingUp, Zap, Clock, DollarSign } from 'lucide-react';
+import { BookOpen, Heart, User, Calendar, TrendingUp, Zap, PlayCircle, Star, Target } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { LoadingSpinner } from '../components/ui/Loading';
+import { StatsCardSkeleton } from '../components/ui/Skeleton';
 import { apiService } from '../services/api';
 import type { UserStats } from '../types';
 
@@ -70,11 +70,7 @@ export const DashboardPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {loading ? (
                     Array.from({ length: 4 }).map((_, i) => (
-                        <Card key={i}>
-                            <CardContent className="p-6">
-                                <LoadingSpinner />
-                            </CardContent>
-                        </Card>
+                        <StatsCardSkeleton key={i} />
                     ))
                 ) : (
                     <>
@@ -169,57 +165,57 @@ export const DashboardPage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Smart Processing Information */}
+            {/* Today's Activity */}
             <div className="mb-8">
-                <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
+                <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
                     <CardHeader>
-                        <CardTitle className="text-green-900 flex items-center gap-2">
-                            <Zap className="h-5 w-5" />
-                            Smart Daily Content Processing
+                        <CardTitle className="text-purple-900 flex items-center gap-2">
+                            <Target className="h-5 w-5" />
+                            Your Content Discovery
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-green-800 mb-4">
-                            Your content is now processed more efficiently with our anti-duplicate system that runs automatically every day at 6 AM UTC.
+                        <p className="text-purple-800 mb-4">
+                            Fresh content is curated for you daily. Discover videos and articles that match your interests perfectly.
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-100">
+                            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-purple-100">
                                 <div className="flex-shrink-0">
-                                    <Clock className="h-5 w-5 text-green-600" />
+                                    <PlayCircle className="h-5 w-5 text-purple-600" />
                                 </div>
                                 <div>
-                                    <p className="font-medium text-green-900 text-sm">Daily Processing</p>
-                                    <p className="text-xs text-green-700">Only new content analyzed</p>
+                                    <p className="font-medium text-purple-900 text-sm">New Videos</p>
+                                    <p className="text-xs text-purple-700">From your subscriptions</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-100">
+                            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-purple-100">
                                 <div className="flex-shrink-0">
-                                    <DollarSign className="h-5 w-5 text-green-600" />
+                                    <Star className="h-5 w-5 text-purple-600" />
                                 </div>
                                 <div>
-                                    <p className="font-medium text-green-900 text-sm">85-95% Cost Reduction</p>
-                                    <p className="text-xs text-green-700">Smart AI processing pipeline</p>
+                                    <p className="font-medium text-purple-900 text-sm">Personalized</p>
+                                    <p className="text-xs text-purple-700">Based on your interests</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-100">
+                            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-purple-100">
                                 <div className="flex-shrink-0">
-                                    <Zap className="h-5 w-5 text-green-600" />
+                                    <Zap className="h-5 w-5 text-purple-600" />
                                 </div>
                                 <div>
-                                    <p className="font-medium text-green-900 text-sm">No Duplicates</p>
-                                    <p className="text-xs text-green-700">Each content analyzed once</p>
+                                    <p className="font-medium text-purple-900 text-sm">Fresh Daily</p>
+                                    <p className="text-xs text-purple-700">Updated every morning</p>
                                 </div>
                             </div>
                         </div>
                         <div className="flex gap-3">
-                            <Link to="/settings">
-                                <Button variant="secondary" className="bg-green-600 text-white hover:bg-green-700 border-green-600">
-                                    Manual Processing
+                            <Link to="/feed">
+                                <Button variant="secondary" className="bg-purple-600 text-white hover:bg-purple-700 border-purple-600">
+                                    Explore Content
                                 </Button>
                             </Link>
-                            <Link to="/feed">
+                            <Link to="/profile">
                                 <Button variant="secondary">
-                                    View Your Feed
+                                    Update Interests
                                 </Button>
                             </Link>
                         </div>
@@ -229,20 +225,20 @@ export const DashboardPage: React.FC = () => {
 
             {/* Getting Started */}
             {(!user?.interests?.length || !user?.youtubeSources?.length) && (
-                <Card className="bg-primary-50 border-primary-200">
+                <Card className="bg-blue-50 border-blue-200">
                     <CardHeader>
-                        <CardTitle className="text-primary-900">Get Started</CardTitle>
+                        <CardTitle className="text-blue-900">Get Started</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-primary-800 mb-4">
+                        <p className="text-blue-800 mb-4">
                             To get the most out of Relevant, make sure to set up your profile:
                         </p>
                         <div className="space-y-2 mb-4">
                             {!user?.interests?.length && (
-                                <p className="text-sm text-primary-700">• Add your interests to get personalized content</p>
+                                <p className="text-sm text-blue-700">• Add your interests to get personalized content</p>
                             )}
                             {!user?.youtubeSources?.length && (
-                                <p className="text-sm text-primary-700">• Connect YouTube channels you follow</p>
+                                <p className="text-sm text-blue-700">• Connect YouTube channels you follow</p>
                             )}
                         </div>
                         <Link to="/profile">

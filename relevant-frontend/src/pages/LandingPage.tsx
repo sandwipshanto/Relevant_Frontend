@@ -29,15 +29,15 @@ export const LandingPage: React.FC = () => {
     ];
 
     const stats = [
-        { icon: Users, value: '10K+', label: 'Active Users' },
-        { icon: TrendingUp, value: '95%', label: 'Relevance Rate' },
-        { icon: Star, value: '4.9', label: 'User Rating' },
+        { icon: Users, value: 'Beta', label: 'Early Access' },
+        { icon: TrendingUp, value: '4-Stage', label: 'AI Pipeline' },
+        { icon: Star, value: 'Free', label: 'To Use' },
     ];
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
             {/* Animated Background */}
-            <div className="absolute inset-0 opacity-20 -z-10">
+            <div className="absolute inset-0 opacity-20">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20"></div>
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,theme(colors.purple.500/0.1),transparent_50%)]"></div>
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,theme(colors.pink.500/0.1),transparent_50%)]"></div>
@@ -46,27 +46,27 @@ export const LandingPage: React.FC = () => {
             {/* Hero Section */}
             <div className="relative isolate px-6 pt-14 lg:px-8">
                 {/* Gradient Orbs */}
-                <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full filter blur-3xl opacity-20 animate-pulse -z-10"></div>
-                <div className="absolute top-40 right-10 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl opacity-20 animate-pulse delay-1000 -z-10"></div>
+                <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full filter blur-3xl opacity-20 animate-pulse"></div>
+                <div className="absolute top-40 right-10 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl opacity-20 animate-pulse delay-1000"></div>
 
                 <div className="mx-auto max-w-4xl py-32 sm:py-48 lg:py-56">
                     <div className="text-center">
                         <div className="mb-8 flex justify-center">
                             <div className="relative rounded-full px-3 py-1 text-sm leading-6 text-purple-300 ring-1 ring-purple-300/20 hover:ring-purple-300/30 transition-all duration-300">
-                                🚀 Now with AI-powered content discovery
+                                AI-powered content discovery
                             </div>
                         </div>
 
                         <h1 className="text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-200 to-white sm:text-7xl leading-tight">
-                            Cut Through the Noise with{' '}
+                            Discover{' '}
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
                                 Relevant
                             </span>
+                            {' '}Content
                         </h1>
 
                         <p className="mt-8 text-xl leading-8 text-gray-300 max-w-3xl mx-auto">
-                            A personal content curator powered by AI that learns your interests and delivers only the most relevant information.
-                            <span className="block mt-2 text-purple-300 font-medium">Say goodbye to information overload forever.</span>
+                            AI-powered content curation that learns your interests and finds the most relevant YouTube content for you.
                         </p>
 
                         <div className="mt-12 flex items-center justify-center gap-x-6">
@@ -153,7 +153,7 @@ export const LandingPage: React.FC = () => {
                                 </Button>
                             </Link>
                             <div className="text-white/80 text-sm">
-                                ✨ No credit card required • ⚡ Setup in 2 minutes
+                                No credit card required
                             </div>
                         </div>
                     </div>

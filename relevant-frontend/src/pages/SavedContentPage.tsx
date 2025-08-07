@@ -8,10 +8,12 @@ import { Input } from '../components/ui/Input';
 import { LoadingSpinner } from '../components/ui/Loading';
 import { ContentCard } from '../components/ui/ContentCard';
 import { ErrorBoundary } from '../components/ErrorBoundary';
+import { ErrorDisplay } from '../components/ui/ErrorDisplay';
 import type { ContentWithUserData, SavedContentQueryParams } from '../types';
 
 export const SavedContentPage: React.FC = () => {
-    const [searchQuery, setSearchQuery] = useState(''); const [params] = useState<SavedContentQueryParams>({
+    const [searchQuery, setSearchQuery] = useState('');
+    const [params, setParams] = useState<SavedContentQueryParams>({
         page: 1,
         limit: 10
     });
@@ -53,7 +55,13 @@ export const SavedContentPage: React.FC = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['savedContent'] });
         }
-    }); const handleContentClick = (content: ContentWithUserData) => {
+    });
+
+    const handleLoadMore = () => {
+        if (savedData?.pagination?.hasMore && !isLoading) {
+            setParams(prev => ({ ...prev, page: (prev.page || 1) + 1 }));
+        }
+    }; const handleContentClick = (content: ContentWithUserData) => {
         if (!content.userContent?.viewed) {
             viewMutation.mutate(content._id);
         }
@@ -122,12 +130,11 @@ export const SavedContentPage: React.FC = () => {
                     <LoadingSpinner size="lg" />
                 </div>
             ) : error ? (
-                <div className="text-center py-12">
-                    <p className="text-red-600 mb-4">Failed to load saved content</p>
-                    <Button onClick={() => refetch()} variant="secondary">
-                        Try Again
-                    </Button>
-                </div>
+                <ErrorDisplay
+                    title="Failed to load saved content"
+                    message="There was an error loading your saved content. Please try again."
+                    onRetry={() => refetch()}
+                />
             ) : filteredContent.length === 0 ? (
                 <div className="text-center py-12">
                     <Bookmark className="h-16 w-16 text-gray-300 mx-auto mb-4" />
@@ -144,9 +151,10 @@ export const SavedContentPage: React.FC = () => {
             ) : (<div className="space-y-6">
                 {filteredContent.map((item: ContentWithUserData) => (
                     <ErrorBoundary key={item._id} fallback={
-                        <div className="p-4 border border-yellow-200 rounded-lg bg-yellow-50">
-                            <p className="text-yellow-800 text-sm">Failed to render this saved content item</p>
-                        </div>
+                        <ErrorDisplay
+                            variant="warning"
+                            message="Failed to render this saved content item"
+                        />
                     }>
                         <ContentCard
                             content={item}
@@ -160,7 +168,7 @@ export const SavedContentPage: React.FC = () => {
                 {savedData?.pagination?.hasMore && (
                     <div className="text-center py-6">
                         <Button
-                            onClick={() => {/* Load more functionality can be added later */ }}
+                            onClick={handleLoadMore}
                             disabled={isLoading}
                             variant="secondary"
                         >

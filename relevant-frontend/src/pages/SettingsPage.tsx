@@ -8,7 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card'
 import { Button } from '../components/ui/Button';
 import { LoadingSpinner } from '../components/ui/Loading';
 import { ErrorBoundary } from '../components/ErrorBoundary';
-import { YouTubeOAuthSection } from '../components/YouTubeOAuthSection';
+import { YouTubeOAuthSection } from '../components/features/YouTubeOAuthSection';
 import type { PreferencesForm } from '../types';
 
 export const SettingsPage: React.FC = () => {
@@ -80,7 +80,7 @@ export const SettingsPage: React.FC = () => {
     const processSubscriptionsMutation = useMutation({
         mutationFn: () => apiService.processSubscriptions(),
         onSuccess: () => {
-            toast.success('Full processing started! All subscriptions will be analyzed.');
+            toast.success('Processing started! All subscriptions will be analyzed.');
             setIsProcessing(true);
             refetchStatus();
         },
@@ -92,7 +92,7 @@ export const SettingsPage: React.FC = () => {
     const processTodaysContentMutation = useMutation({
         mutationFn: () => apiService.processTodaysContent(),
         onSuccess: () => {
-            toast.success('Today\'s content processing started! New content will be analyzed.');
+            toast.success('Processing started! New content will be analyzed.');
             setIsProcessing(true);
             refetchStatus();
         },
@@ -115,6 +115,13 @@ export const SettingsPage: React.FC = () => {
 
     const handlePreferenceChange = (key: keyof PreferencesForm, value: any) => {
         setPreferences(prev => ({ ...prev, [key]: value }));
+    };
+
+    // Helper function to safely get numeric values from processing status
+    const getJobCount = (value: any): number => {
+        if (typeof value === 'number') return value;
+        if (Array.isArray(value)) return value.length;
+        return 0;
     };
 
     if (profileLoading) {
@@ -250,17 +257,13 @@ export const SettingsPage: React.FC = () => {
                                         <div className="flex justify-between">
                                             <span className="text-gray-600">Active Jobs:</span>
                                             <span className="font-medium">
-                                                {typeof processingStatus.activeJobs === 'number' ? processingStatus.activeJobs :
-                                                    Array.isArray(processingStatus.activeJobs) ? processingStatus.activeJobs.length :
-                                                        processingStatus.activeJobs ? '?' : 0}
+                                                {getJobCount(processingStatus.activeJobs)}
                                             </span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-gray-600">Queued Jobs:</span>
                                             <span className="font-medium">
-                                                {typeof processingStatus.queuedJobs === 'number' ? processingStatus.queuedJobs :
-                                                    Array.isArray(processingStatus.queuedJobs) ? processingStatus.queuedJobs.length :
-                                                        processingStatus.queuedJobs ? '?' : 0}
+                                                {getJobCount(processingStatus.queuedJobs)}
                                             </span>
                                         </div>
                                         {processingStatus.lastUpdate && (

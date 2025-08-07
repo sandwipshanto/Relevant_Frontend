@@ -24,6 +24,18 @@ const queryClient = new QueryClient({
   },
 });
 
+// Layout wrapper that includes header
+const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <div className={`min-h-screen ${isAuthenticated ? 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50' : 'bg-gray-50'}`}>
+      <Header />
+      <main className="pt-16">{children}</main>
+    </div>
+  );
+};
+
 // Route wrapper for authenticated users
 const AuthenticatedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -38,108 +50,111 @@ const AuthenticatedRoute: React.FC<{ children: React.ReactNode }> = ({ children 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <AuthProvider>
-          <AppContent />
+      <AuthProvider>
+        <Router>
+          <Routes>
+            {/* Public routes */}
+            <Route
+              path="/"
+              element={
+                <AppLayout>
+                  <LandingPage />
+                </AppLayout>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <AuthenticatedRoute>
+                  <LoginPage />
+                </AuthenticatedRoute>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <AuthenticatedRoute>
+                  <RegisterPage />
+                </AuthenticatedRoute>
+              }
+            />
+
+            {/* OAuth callback route */}
+            <Route
+              path="/auth/youtube/callback"
+              element={<YouTubeCallbackPage />}
+            />
+
+            {/* Protected routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <DashboardPage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/feed"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <FeedPage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/saved"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <SavedContentPage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <ProfilePage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <SettingsPage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/youtube-callback"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <YouTubeCallbackPage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Catch all route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
           <Toaster position="top-right" />
-        </AuthProvider>
-      </Router>
+        </Router>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
-
-const AppContent: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  
-  return (
-    <div className={`min-h-screen ${isAuthenticated ? 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50' : 'bg-gray-50'}`}>
-      <Header />
-      <main>
-        <Routes>
-          {/* Public routes */}
-          <Route
-            path="/"
-            element={<LandingPage />}
-          />
-          <Route
-            path="/login"
-            element={
-              <AuthenticatedRoute>
-                <LoginPage />
-              </AuthenticatedRoute>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <AuthenticatedRoute>
-                <RegisterPage />
-              </AuthenticatedRoute>
-            }
-          />
-
-          {/* OAuth callback route */}
-          <Route
-            path="/auth/youtube/callback"
-            element={<YouTubeCallbackPage />}
-          />
-
-          {/* Protected routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/feed"
-            element={
-              <ProtectedRoute>
-                <FeedPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/saved"
-            element={
-              <ProtectedRoute>
-                <SavedContentPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <SettingsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/youtube-callback"
-            element={
-              <ProtectedRoute>
-                <YouTubeCallbackPage />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Catch all route */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
-    </div>
-  );
-};
 
 export default App;

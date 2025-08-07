@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { Button } from './ui/Button';
-import { LoadingSpinner } from './ui/Loading';
-import { useYouTubeOAuth } from '../hooks/useYouTubeOAuth';
+import { Button } from '../ui/Button';
+import { LoadingSpinner } from '../ui/Loading';
+import { useYouTubeOAuth } from '../../hooks/useYouTubeOAuth';
 
 export const YouTubeOAuthSection: React.FC = () => {
     const { status, connect, disconnect, syncSubscriptions } = useYouTubeOAuth();
