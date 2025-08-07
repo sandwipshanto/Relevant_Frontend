@@ -2,29 +2,29 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
-    size?: 'sm' | 'md' | 'lg' | 'xl';
-    isLoading?: boolean;
-    leftIcon?: React.ReactNode;
-    rightIcon?: React.ReactNode;
-    fullWidth?: boolean;
-    rounded?: boolean;
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  isLoading?: boolean;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  fullWidth?: boolean;
+  rounded?: boolean;
 }
 
 export const Button: React.FC<ButtonProps> = ({
-    children,
-    variant = 'primary',
-    size = 'md',
-    isLoading = false,
-    leftIcon,
-    rightIcon,
-    fullWidth = false,
-    rounded = false,
-    disabled,
-    className = '',
-    ...props
+  children,
+  variant = 'primary',
+  size = 'md',
+  isLoading = false,
+  leftIcon,
+  rightIcon,
+  fullWidth = false,
+  rounded = false,
+  disabled,
+  className = '',
+  ...props
 }) => {
-    const baseClasses = `
+  const baseClasses = `
     inline-flex items-center justify-center font-semibold
     transform transition-all duration-200 
     focus:outline-none focus:ring-4 
@@ -33,43 +33,43 @@ export const Button: React.FC<ButtonProps> = ({
     ${isLoading ? 'cursor-wait' : 'cursor-pointer'}
   `;
 
-    const variants = {
-        primary: `
+  const variants = {
+    primary: `
       bg-gradient-to-r from-slate-600 to-slate-700 text-white
       hover:from-slate-500 hover:to-slate-600 hover:scale-105 hover:shadow-lg
       focus:ring-slate-500/25 active:scale-95
     `,
-        secondary: `
+    secondary: `
       bg-white text-slate-700 border-2 border-slate-200
       hover:border-slate-300 hover:scale-105 hover:shadow-md hover:bg-slate-50
       focus:ring-slate-500/25 active:scale-95
     `,
-        ghost: `
+    ghost: `
       text-slate-600 hover:text-slate-900 hover:bg-slate-100
       focus:ring-slate-500/25 active:scale-95
     `,
-        danger: `
+    danger: `
       bg-gradient-to-r from-red-500 to-red-600 text-white
       hover:from-red-600 hover:to-red-700 hover:scale-105 hover:shadow-lg
       focus:ring-red-500/25 active:scale-95
     `,
-        success: `
+    success: `
       bg-gradient-to-r from-green-500 to-green-600 text-white
       hover:from-green-600 hover:to-green-700 hover:scale-105 hover:shadow-lg
       focus:ring-green-500/25 active:scale-95
     `,
-    };
+  };
 
-    const sizes = {
-        sm: 'px-3 py-1.5 text-sm rounded-lg',
-        md: 'px-6 py-3 text-base rounded-xl',
-        lg: 'px-8 py-4 text-lg rounded-xl',
-        xl: 'px-10 py-5 text-xl rounded-2xl',
-    };
+  const sizes = {
+    sm: 'px-3 py-1.5 text-sm rounded-lg',
+    md: 'px-6 py-3 text-base rounded-xl',
+    lg: 'px-8 py-4 text-lg rounded-xl',
+    xl: 'px-10 py-5 text-xl rounded-2xl',
+  };
 
-    const roundedClasses = rounded ? 'rounded-full' : '';
+  const roundedClasses = rounded ? 'rounded-full' : '';
 
-    const classes = `
+  const classes = `
     ${baseClasses}
     ${variants[variant]}
     ${sizes[size]}
@@ -77,27 +77,27 @@ export const Button: React.FC<ButtonProps> = ({
     ${className}
   `.replace(/\s+/g, ' ').trim();
 
-    return (
-        <button
-            className={classes}
-            disabled={disabled || isLoading}
-            {...props}
-        >
-            {isLoading && (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            )}
+  return (
+    <button
+      className={classes}
+      disabled={disabled || isLoading}
+      {...props}
+    >
+      {isLoading && (
+        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+      )}
 
-            {!isLoading && leftIcon && (
-                <span className="mr-2">{leftIcon}</span>
-            )}
+      {!isLoading && leftIcon && (
+        <span className="mr-2">{leftIcon}</span>
+      )}
 
-            <span className={isLoading ? 'opacity-70' : ''}>
-                {children}
-            </span>
+      <span className={isLoading ? 'opacity-70' : ''}>
+        {children}
+      </span>
 
-            {!isLoading && rightIcon && (
-                <span className="ml-2">{rightIcon}</span>
-            )}
-        </button>
-    );
+      {!isLoading && rightIcon && (
+        <span className="ml-2">{rightIcon}</span>
+      )}
+    </button>
+  );
 };

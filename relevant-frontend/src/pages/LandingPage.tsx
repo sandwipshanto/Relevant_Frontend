@@ -140,12 +140,12 @@ export const LandingPage: React.FC = () => {
                 {/* Enhanced background gradients */}
                 <div className="absolute inset-0 bg-gradient-to-br from-slate-100 via-gray-100 to-stone-100"></div>
                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/50 to-white/30"></div>
-                
+
                 {/* Elegant decorative elements */}
                 <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-slate-300/30 to-transparent rounded-full blur-3xl animate-pulse"></div>
                 <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-tl from-green-200/30 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-stone-200/20 to-transparent rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
-                
+
                 <div className="relative mx-auto max-w-4xl text-center px-6 lg:px-8">
                     <h2 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl mb-8">
                         Ready to discover relevant content?
@@ -156,8 +156,8 @@ export const LandingPage: React.FC = () => {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                         <Link to="/register">
-                            <Button 
-                                size="lg" 
+                            <Button
+                                size="lg"
                                 className="bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white px-12 py-4 text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border-0"
                             >
                                 Start Free Today

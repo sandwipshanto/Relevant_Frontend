@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { 
-    User, Settings, Bell, Shield, Youtube, BookOpen, TrendingUp, 
+import {
+    User, Settings, Bell, Shield, Youtube, BookOpen, TrendingUp,
     Calendar, Edit3, X, Eye, Heart
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -36,27 +36,27 @@ export const YouPage: React.FC = () => {
     ];
 
     const profileStats = [
-        { 
-            label: 'Content Viewed', 
+        {
+            label: 'Content Viewed',
             value: 0, // This would need to be tracked separately
             icon: Eye,
             color: 'blue'
         },
-        { 
-            label: 'Items Saved', 
+        {
+            label: 'Items Saved',
             value: 0, // This would need to be tracked separately
             icon: Heart,
             color: 'red'
         },
-        { 
-            label: 'Interests', 
-            value: userStats?.stats?.totalInterests || 0, 
+        {
+            label: 'Interests',
+            value: userStats?.stats?.totalInterests || 0,
             icon: BookOpen,
             color: 'green'
         },
-        { 
-            label: 'YouTube Sources', 
-            value: userStats?.stats?.totalYoutubeSources || 0, 
+        {
+            label: 'YouTube Sources',
+            value: userStats?.stats?.totalYoutubeSources || 0,
             icon: Calendar,
             color: 'purple'
         }
@@ -107,7 +107,7 @@ export const YouPage: React.FC = () => {
                         green: 'bg-green-100 text-green-600',
                         purple: 'bg-purple-100 text-purple-600'
                     };
-                    
+
                     return (
                         <Card key={stat.label} className="bg-white/60 backdrop-blur-sm border-slate-200/50">
                             <CardContent className="p-6">
@@ -159,7 +159,7 @@ export const YouPage: React.FC = () => {
                         <BookOpen className="w-5 h-5" />
                         Your Interests
                     </h3>
-                    
+
                     {user?.interests ? (
                         <div className="space-y-6">
                             {typeof user.interests === 'object' && !Array.isArray(user.interests) ? (
@@ -300,11 +300,10 @@ export const YouPage: React.FC = () => {
                                         <button
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id)}
-                                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
-                                                activeTab === tab.id
+                                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${activeTab === tab.id
                                                     ? 'bg-slate-100 text-slate-700 font-semibold'
                                                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-700'
-                                            }`}
+                                                }`}
                                         >
                                             <Icon size={20} />
                                             {tab.name}

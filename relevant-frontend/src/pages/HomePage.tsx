@@ -94,7 +94,7 @@ export const HomePage: React.FC = () => {
                                     AI-curated content tailored to your interests
                                 </p>
                             </div>
-                            
+
                             <div className="flex items-center gap-3">
                                 {/* View Mode Toggle */}
                                 <div className="flex bg-slate-100 rounded-lg p-1">
@@ -198,8 +198,8 @@ export const HomePage: React.FC = () => {
                     ) : (
                         <>
                             {/* Content Grid/List */}
-                            <div className={viewMode === 'grid' 
-                                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
+                            <div className={viewMode === 'grid'
+                                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
                                 : 'space-y-4'
                             }>
                                 {allContent.map((item) => (
@@ -209,9 +209,9 @@ export const HomePage: React.FC = () => {
                                         onSave={(contentId: string, saved: boolean) => {
                                             if (saved) handleSaveContent(contentId);
                                         }}
-                                        onLike={() => {}}
-                                        onDismiss={() => {}}
-                                        onView={() => {}}
+                                        onLike={() => { }}
+                                        onDismiss={() => { }}
+                                        onView={() => { }}
                                         showDismiss={false}
                                     />
                                 ))}

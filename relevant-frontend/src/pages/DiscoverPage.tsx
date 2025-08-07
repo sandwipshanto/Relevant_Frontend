@@ -79,7 +79,7 @@ export const DiscoverPage: React.FC = () => {
                                         Explore trending content and discover new interests
                                     </p>
                                 </div>
-                                
+
                                 {/* View Mode Toggle */}
                                 <div className="flex bg-slate-100 rounded-lg p-1">
                                     <Button
@@ -188,17 +188,17 @@ export const DiscoverPage: React.FC = () => {
                             </div>
                             <h3 className="text-xl font-semibold text-slate-700 mb-2">No content found</h3>
                             <p className="text-slate-500 mb-6">
-                                {searchQuery ? 
+                                {searchQuery ?
                                     `No results found for "${searchQuery}". Try different keywords.` :
                                     'No content available in this category.'
                                 }
                             </p>
                             {searchQuery && (
-                                <Button 
+                                <Button
                                     onClick={() => {
                                         setSearchQuery('');
                                         setSelectedCategory('all');
-                                    }} 
+                                    }}
                                     variant="secondary"
                                 >
                                     Clear Search
@@ -208,8 +208,8 @@ export const DiscoverPage: React.FC = () => {
                     ) : (
                         <>
                             {/* Content Grid/List */}
-                            <div className={viewMode === 'grid' 
-                                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' 
+                            <div className={viewMode === 'grid'
+                                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
                                 : 'space-y-4'
                             }>
                                 {discoverData.content.map((item) => (
@@ -219,9 +219,9 @@ export const DiscoverPage: React.FC = () => {
                                         onSave={(contentId: string, saved: boolean) => {
                                             if (saved) handleSaveContent(contentId);
                                         }}
-                                        onLike={() => {}}
-                                        onDismiss={() => {}}
-                                        onView={() => {}}
+                                        onLike={() => { }}
+                                        onDismiss={() => { }}
+                                        onView={() => { }}
                                         showDismiss={false}
                                     />
                                 ))}
