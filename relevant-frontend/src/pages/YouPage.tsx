@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     User, Settings, Bell, Shield, Youtube, BookOpen,
-    Calendar, Edit3, X, Eye, Heart, Plus, Trash2, Star, BarChart3
+    Calendar, Edit3, X, Eye, Heart, Plus, Trash2, Star, BarChart3,
+    Save, Camera, Moon, Sun, Palette, Volume2, VolumeX
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
 import { apiService } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent } from '../components/ui/Card';
+import { Input } from '../components/ui/Input';
 import { LoadingSkeleton } from '../components/ui/LoadingSkeleton';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { YouTubeOAuthSection } from '../components/features/YouTubeOAuthSection';
@@ -19,6 +21,35 @@ export const YouPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState('profile');
     const [isEditing, setIsEditing] = useState(false);
     const [showInterestSelector, setShowInterestSelector] = useState(false);
+
+    // Profile editing state
+    const [profileForm, setProfileForm] = useState({
+        name: user?.name || '',
+        email: user?.email || ''
+    });
+
+    // Preferences state
+    const [preferences, setPreferences] = useState({
+        notifications: {
+            newContent: true,
+            weeklyDigest: false,
+            recommendations: true,
+            socialUpdates: false
+        },
+        display: {
+            theme: 'light',
+            viewMode: 'grid',
+            compactMode: false
+        },
+        audio: {
+            soundEffects: true
+        },
+        privacy: {
+            dataCollection: true,
+            analytics: false,
+            publicProfile: false
+        }
+    });
 
     const queryClient = useQueryClient();
 
@@ -77,6 +108,39 @@ export const YouPage: React.FC = () => {
         },
         onError: (error: any) => {
             toast.error(error.response?.data?.message || 'Failed to remove interest');
+        }
+    });
+
+    // Update profile mutation (using a method we'll create)
+    const updateProfileMutation = useMutation({
+        mutationFn: async (data: { name: string }) => {
+            // For now, we'll use preferences endpoint to update profile
+            // This would ideally be a separate profile update endpoint
+            const response = await fetch('/api/user/profile', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return response.json();
+        },
+        onSuccess: () => {
+            toast.success('Profile updated successfully!');
+            setIsEditing(false);
+            queryClient.invalidateQueries({ queryKey: ['user'] });
+        },
+        onError: () => {
+            toast.error('Failed to update profile');
+        }
+    });
+
+    // Update preferences mutation
+    const updatePreferencesMutation = useMutation({
+        mutationFn: (data: any) => apiService.updatePreferences(data),
+        onSuccess: () => {
+            toast.success('Preferences updated successfully!');
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || 'Failed to update preferences');
         }
     });
 
@@ -144,29 +208,103 @@ export const YouPage: React.FC = () => {
         }
     };
 
+    // Handle profile form submission
+    const handleProfileSave = () => {
+        if (!profileForm.name.trim()) {
+            toast.error('Name is required');
+            return;
+        }
+        updateProfileMutation.mutate({ name: profileForm.name.trim() });
+    };
+
+    // Handle preference toggle
+    const handlePreferenceToggle = (category: string, key: string, value: any) => {
+        const newPreferences = {
+            ...preferences,
+            [category]: {
+                ...preferences[category as keyof typeof preferences],
+                [key]: value
+            }
+        };
+        setPreferences(newPreferences);
+        // Update preferences immediately
+        updatePreferencesMutation.mutate(newPreferences);
+    };
+
     const renderProfileTab = () => (
         <div className="space-y-8">
             {/* Profile Header */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/50">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-                    <div className="w-20 h-20 bg-gradient-to-br from-slate-600 to-slate-700 rounded-2xl flex items-center justify-center">
-                        <User className="w-10 h-10 text-white" />
+                <div className="flex flex-col sm:flex-row sm:items-start gap-6">
+                    <div className="relative group">
+                        <div className="w-20 h-20 bg-gradient-to-br from-slate-600 to-slate-700 rounded-2xl flex items-center justify-center">
+                            <User className="w-10 h-10 text-white" />
+                        </div>
+                        {isEditing && (
+                            <div className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Camera className="w-6 h-6 text-white" />
+                            </div>
+                        )}
                     </div>
                     <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                            <h2 className="text-2xl font-bold text-slate-900">
-                                {user?.name || 'Your Profile'}
-                            </h2>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setIsEditing(!isEditing)}
-                                className="text-slate-600 hover:text-slate-800"
-                            >
-                                {isEditing ? <X size={16} /> : <Edit3 size={16} />}
-                            </Button>
+                        <div className="flex items-center gap-3 mb-4">
+                            {isEditing ? (
+                                <div className="flex-1 space-y-3">
+                                    <Input
+                                        value={profileForm.name}
+                                        onChange={(e) => setProfileForm(prev => ({ ...prev, name: e.target.value }))}
+                                        placeholder="Your name"
+                                        className="text-2xl font-bold border-slate-300 focus:border-slate-500"
+                                    />
+                                </div>
+                            ) : (
+                                <h2 className="text-2xl font-bold text-slate-900">
+                                    {user?.name || 'Your Profile'}
+                                </h2>
+                            )}
+                            <div className="flex gap-2">
+                                {isEditing ? (
+                                    <>
+                                        <Button
+                                            variant="primary"
+                                            size="sm"
+                                            onClick={handleProfileSave}
+                                            disabled={updateProfileMutation.isPending}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <Save className="w-4 h-4" />
+                                            Save
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => {
+                                                setIsEditing(false);
+                                                setProfileForm({
+                                                    name: user?.name || '',
+                                                    email: user?.email || ''
+                                                });
+                                            }}
+                                            className="text-slate-600 hover:text-slate-800"
+                                        >
+                                            <X size={16} />
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setIsEditing(true)}
+                                        className="text-slate-600 hover:text-slate-800"
+                                    >
+                                        <Edit3 size={16} />
+                                    </Button>
+                                )}
+                            </div>
                         </div>
+
                         <p className="text-slate-600 mb-4">{user?.email}</p>
+
                         <div className="flex flex-wrap gap-2">
                             <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
                                 Active Member
@@ -448,27 +586,184 @@ export const YouPage: React.FC = () => {
         </div>
     );
 
-    const renderPreferencesTab = () => (
-        <div className="space-y-6">
-            <Card className="bg-white/80 backdrop-blur-sm border-slate-200/50">
-                <CardContent className="p-8">
-                    <h3 className="text-xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
-                        <Bell className="w-5 h-5" />
-                        Notifications
-                    </h3>
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <div className="font-medium text-slate-900">New Content Alerts</div>
-                                <div className="text-sm text-slate-600">Get notified when new relevant content is available</div>
+    const renderPreferencesTab = () => {
+        // Toggle component
+        const Toggle = ({ checked, onChange, disabled = false }: { checked: boolean; onChange: (value: boolean) => void; disabled?: boolean }) => (
+            <button
+                onClick={() => !disabled && onChange(!checked)}
+                disabled={disabled}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 ${checked ? 'bg-green-600' : 'bg-slate-200'
+                    } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            >
+                <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${checked ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                />
+            </button>
+        );
+
+        return (
+            <div className="space-y-6">
+                {/* Notifications */}
+                <Card className="bg-white/80 backdrop-blur-sm border-slate-200/50">
+                    <CardContent className="p-8">
+                        <h3 className="text-xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
+                            <Bell className="w-5 h-5" />
+                            Notifications
+                        </h3>
+                        <div className="space-y-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="font-medium text-slate-900">New Content Alerts</div>
+                                    <div className="text-sm text-slate-600">Get notified when new relevant content is available</div>
+                                </div>
+                                <Toggle
+                                    checked={preferences.notifications.newContent}
+                                    onChange={(value) => handlePreferenceToggle('notifications', 'newContent', value)}
+                                    disabled={updatePreferencesMutation.isPending}
+                                />
                             </div>
-                            <Button variant="secondary" size="sm">Enable</Button>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="font-medium text-slate-900">Weekly Digest</div>
+                                    <div className="text-sm text-slate-600">Receive a weekly summary of your feed</div>
+                                </div>
+                                <Toggle
+                                    checked={preferences.notifications.weeklyDigest}
+                                    onChange={(value) => handlePreferenceToggle('notifications', 'weeklyDigest', value)}
+                                    disabled={updatePreferencesMutation.isPending}
+                                />
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="font-medium text-slate-900">Recommendations</div>
+                                    <div className="text-sm text-slate-600">Get personalized content suggestions</div>
+                                </div>
+                                <Toggle
+                                    checked={preferences.notifications.recommendations}
+                                    onChange={(value) => handlePreferenceToggle('notifications', 'recommendations', value)}
+                                    disabled={updatePreferencesMutation.isPending}
+                                />
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="font-medium text-slate-900">Social Updates</div>
+                                    <div className="text-sm text-slate-600">Updates from connected social accounts</div>
+                                </div>
+                                <Toggle
+                                    checked={preferences.notifications.socialUpdates}
+                                    onChange={(value) => handlePreferenceToggle('notifications', 'socialUpdates', value)}
+                                    disabled={updatePreferencesMutation.isPending}
+                                />
+                            </div>
                         </div>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-    );
+                    </CardContent>
+                </Card>
+
+                {/* Display Preferences */}
+                <Card className="bg-white/80 backdrop-blur-sm border-slate-200/50">
+                    <CardContent className="p-8">
+                        <h3 className="text-xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
+                            <Palette className="w-5 h-5" />
+                            Display
+                        </h3>
+                        <div className="space-y-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="font-medium text-slate-900">Theme</div>
+                                    <div className="text-sm text-slate-600">Choose your preferred theme</div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handlePreferenceToggle('display', 'theme', 'light')}
+                                        className={`p-2 rounded-lg transition-all ${preferences.display.theme === 'light'
+                                                ? 'bg-yellow-100 text-yellow-700 ring-2 ring-yellow-500'
+                                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                            }`}
+                                    >
+                                        <Sun className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => handlePreferenceToggle('display', 'theme', 'dark')}
+                                        className={`p-2 rounded-lg transition-all ${preferences.display.theme === 'dark'
+                                                ? 'bg-slate-800 text-slate-100 ring-2 ring-slate-600'
+                                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                            }`}
+                                    >
+                                        <Moon className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="font-medium text-slate-900">Default View Mode</div>
+                                    <div className="text-sm text-slate-600">How content is displayed by default</div>
+                                </div>
+                                <select
+                                    value={preferences.display.viewMode}
+                                    onChange={(e) => handlePreferenceToggle('display', 'viewMode', e.target.value)}
+                                    className="px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-700 focus:border-slate-500 focus:ring-1 focus:ring-slate-500"
+                                >
+                                    <option value="grid">Grid View</option>
+                                    <option value="list">List View</option>
+                                    <option value="compact">Compact View</option>
+                                </select>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="font-medium text-slate-900">Compact Mode</div>
+                                    <div className="text-sm text-slate-600">Show more content with less spacing</div>
+                                </div>
+                                <Toggle
+                                    checked={preferences.display.compactMode}
+                                    onChange={(value) => handlePreferenceToggle('display', 'compactMode', value)}
+                                    disabled={updatePreferencesMutation.isPending}
+                                />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Audio/Sound Preferences */}
+                <Card className="bg-white/80 backdrop-blur-sm border-slate-200/50">
+                    <CardContent className="p-8">
+                        <h3 className="text-xl font-semibold text-slate-900 mb-6 flex items-center gap-3">
+                            <Volume2 className="w-5 h-5" />
+                            Audio
+                        </h3>
+                        <div className="space-y-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="font-medium text-slate-900">Sound Effects</div>
+                                    <div className="text-sm text-slate-600">Play sounds for notifications and interactions</div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handlePreferenceToggle('audio', 'soundEffects', true)}
+                                        className={`p-2 rounded-lg transition-all ${preferences.audio?.soundEffects !== false
+                                                ? 'bg-green-100 text-green-700 ring-2 ring-green-500'
+                                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                            }`}
+                                    >
+                                        <Volume2 className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => handlePreferenceToggle('audio', 'soundEffects', false)}
+                                        className={`p-2 rounded-lg transition-all ${preferences.audio?.soundEffects === false
+                                                ? 'bg-red-100 text-red-700 ring-2 ring-red-500'
+                                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                            }`}
+                                    >
+                                        <VolumeX className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    };
 
     const renderPrivacyTab = () => (
         <div className="space-y-6">
