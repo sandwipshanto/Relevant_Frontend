@@ -35,18 +35,18 @@ export const Button: React.FC<ButtonProps> = ({
 
     const variants = {
         primary: `
-      bg-gradient-to-r from-blue-500 to-purple-600 text-white
-      hover:from-blue-600 hover:to-purple-700 hover:scale-105 hover:shadow-lg
-      focus:ring-blue-500/25 active:scale-95
+      bg-gradient-to-r from-slate-600 to-slate-700 text-white
+      hover:from-slate-500 hover:to-slate-600 hover:scale-105 hover:shadow-lg
+      focus:ring-slate-500/25 active:scale-95
     `,
         secondary: `
-      bg-white text-gray-700 border-2 border-gray-200
-      hover:border-gray-300 hover:scale-105 hover:shadow-md hover:bg-gray-50
-      focus:ring-gray-500/25 active:scale-95
+      bg-white text-slate-700 border-2 border-slate-200
+      hover:border-slate-300 hover:scale-105 hover:shadow-md hover:bg-slate-50
+      focus:ring-slate-500/25 active:scale-95
     `,
         ghost: `
-      text-gray-600 hover:text-gray-900 hover:bg-gray-100
-      focus:ring-gray-500/25 active:scale-95
+      text-slate-600 hover:text-slate-900 hover:bg-slate-100
+      focus:ring-slate-500/25 active:scale-95
     `,
         danger: `
       bg-gradient-to-r from-red-500 to-red-600 text-white

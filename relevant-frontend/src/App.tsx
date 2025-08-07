@@ -8,12 +8,17 @@ import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { FeedPage } from './pages/FeedPage';
+import { HomePage } from './pages/HomePage';
+import { DiscoverPage } from './pages/DiscoverPage';
 import { SavedContentPage } from './pages/SavedContentPage';
-import { ProfilePage } from './pages/ProfilePage';
+import { YouPage } from './pages/YouPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { YouTubeCallbackPage } from './pages/YouTubeCallbackPage';
+
+// Keep legacy imports for backward compatibility
+import { DashboardPage } from './pages/DashboardPage';
+import { FeedPage } from './pages/FeedPage';
+import { ProfilePage } from './pages/ProfilePage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,7 +46,7 @@ const AuthenticatedRoute: React.FC<{ children: React.ReactNode }> = ({ children 
   const { isAuthenticated } = useAuth();
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return <>{children}</>;
@@ -85,7 +90,49 @@ function App() {
               element={<YouTubeCallbackPage />}
             />
 
-            {/* Protected routes */}
+            {/* Phase 2: Content-First Navigation Routes */}
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <HomePage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/discover"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <DiscoverPage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/saved"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <SavedContentPage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/you"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <YouPage />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Legacy Routes (for backward compatibility) */}
             <Route
               path="/dashboard"
               element={
@@ -102,16 +149,6 @@ function App() {
                 <ProtectedRoute>
                   <AppLayout>
                     <FeedPage />
-                  </AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/saved"
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <SavedContentPage />
                   </AppLayout>
                 </ProtectedRoute>
               }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut, Settings, BookOpen, Home, Heart } from 'lucide-react';
+import { Menu, X, LogOut, Settings, Compass, Home, Bookmark, UserCircle } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { Button } from '../ui/Button';
 
@@ -10,40 +10,40 @@ export const Header: React.FC = () => {
     const location = useLocation();
 
     const navigation = [
-        { name: 'Dashboard', href: '/dashboard', icon: Home },
-        { name: 'Feed', href: '/feed', icon: BookOpen },
-        { name: 'Saved', href: '/saved', icon: Heart },
-        { name: 'Profile', href: '/profile', icon: User },
+        { name: 'Home', href: '/home', icon: Home, description: 'Your personalized feed' },
+        { name: 'Discover', href: '/discover', icon: Compass, description: 'Explore trending content' },
+        { name: 'Saved', href: '/saved', icon: Bookmark, description: 'Your bookmarked content' },
+        { name: 'You', href: '/you', icon: UserCircle, description: 'Profile & settings' },
     ];
 
     const isActive = (path: string) => location.pathname === path;
 
     return (
-        <header className="bg-white shadow-sm border-b fixed top-0 left-0 right-0 z-50">
+        <header className="bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200/50 fixed top-0 left-0 right-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
                     <div className="flex items-center">
                         <Link to="/" className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                            <div className="w-8 h-8 bg-slate-600 rounded-lg flex items-center justify-center">
                                 <span className="text-white font-bold">R</span>
                             </div>
-                            <span className="text-xl font-bold text-gray-900">Relevant</span>
+                            <span className="text-xl font-bold text-slate-900">Relevant</span>
                         </Link>
                     </div>
 
                     {/* Desktop Navigation */}
                     {isAuthenticated && (
-                        <nav className="hidden md:flex space-x-8 items-center relative z-10">
+                        <nav className="hidden md:flex space-x-1 items-center relative z-10">
                             {navigation.map((item) => {
                                 const Icon = item.icon;
                                 return (
                                     <Link
                                         key={item.name}
                                         to={item.href}
-                                        onClick={() => console.log('Nav link clicked:', item.name, item.href)}
-                                        className={`inline-flex items-center px-3 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer hover:bg-gray-100 rounded-t-md relative z-10 ${isActive(item.href)
-                                            ? 'border-purple-500 text-purple-600 bg-purple-50'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 hover:bg-gray-50'
+                                        title={item.description}
+                                        className={`group inline-flex items-center px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 cursor-pointer relative z-10 ${isActive(item.href)
+                                            ? 'bg-slate-100 text-slate-700 shadow-sm'
+                                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-700'
                                             }`}
                                         style={{
                                             pointerEvents: 'auto',
@@ -51,7 +51,7 @@ export const Header: React.FC = () => {
                                             zIndex: 100
                                         }}
                                     >
-                                        <Icon size={16} className="mr-2" />
+                                        <Icon size={18} className="mr-2" />
                                         {item.name}
                                     </Link>
                                 );
@@ -101,22 +101,25 @@ export const Header: React.FC = () => {
 
             {/* Mobile Navigation */}
             {isAuthenticated && isMobileMenuOpen && (
-                <div className="md:hidden border-t border-gray-200">
-                    <div className="px-2 pt-2 pb-3 space-y-1">
+                <div className="md:hidden border-t border-slate-200 bg-white/95 backdrop-blur-md">
+                    <div className="px-4 pt-4 pb-6 space-y-2">
                         {navigation.map((item) => {
                             const Icon = item.icon;
                             return (
                                 <Link
                                     key={item.name}
                                     to={item.href}
-                                    className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive(item.href)
-                                        ? 'bg-purple-50 text-purple-700'
-                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                    className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${isActive(item.href)
+                                        ? 'bg-slate-100 text-slate-700 shadow-sm'
+                                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-700'
                                         }`}
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
                                     <Icon size={20} className="mr-3" />
-                                    {item.name}
+                                    <div>
+                                        <div className="font-semibold">{item.name}</div>
+                                        <div className="text-xs text-slate-500">{item.description}</div>
+                                    </div>
                                 </Link>
                             );
                         })}
