@@ -34,28 +34,28 @@ export const Header: React.FC = () => {
                     {/* Desktop Navigation */}
                     {isAuthenticated && (
                         <nav className="hidden md:flex space-x-8 items-center relative z-10">
-                        {navigation.map((item) => {
-                            const Icon = item.icon;
-                            return (
-                                <Link
-                                    key={item.name}
-                                    to={item.href}
-                                    onClick={() => console.log('Nav link clicked:', item.name, item.href)}
-                                    className={`inline-flex items-center px-3 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer hover:bg-gray-100 rounded-t-md relative z-10 ${isActive(item.href)
+                            {navigation.map((item) => {
+                                const Icon = item.icon;
+                                return (
+                                    <Link
+                                        key={item.name}
+                                        to={item.href}
+                                        onClick={() => console.log('Nav link clicked:', item.name, item.href)}
+                                        className={`inline-flex items-center px-3 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer hover:bg-gray-100 rounded-t-md relative z-10 ${isActive(item.href)
                                             ? 'border-purple-500 text-purple-600 bg-purple-50'
                                             : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 hover:bg-gray-50'
-                                        }`}
-                                    style={{ 
-                                        pointerEvents: 'auto',
-                                        position: 'relative',
-                                        zIndex: 100
-                                    }}
-                                >
-                                    <Icon size={16} className="mr-2" />
-                                    {item.name}
-                                </Link>
-                            );
-                        })}
+                                            }`}
+                                        style={{
+                                            pointerEvents: 'auto',
+                                            position: 'relative',
+                                            zIndex: 100
+                                        }}
+                                    >
+                                        <Icon size={16} className="mr-2" />
+                                        {item.name}
+                                    </Link>
+                                );
+                            })}
                         </nav>
                     )}
 
@@ -110,8 +110,8 @@ export const Header: React.FC = () => {
                                     key={item.name}
                                     to={item.href}
                                     className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive(item.href)
-                                            ? 'bg-purple-50 text-purple-700'
-                                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                        ? 'bg-purple-50 text-purple-700'
+                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                         }`}
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >

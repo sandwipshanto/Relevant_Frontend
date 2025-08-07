@@ -55,9 +55,9 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
                     </p>
                     {onRetry && (
                         <div className="mt-3">
-                            <Button 
-                                onClick={onRetry} 
-                                variant="secondary" 
+                            <Button
+                                onClick={onRetry}
+                                variant="secondary"
                                 size="sm"
                                 className="flex items-center gap-2"
                             >
