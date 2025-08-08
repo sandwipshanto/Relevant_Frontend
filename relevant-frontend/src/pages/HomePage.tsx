@@ -8,6 +8,7 @@ import { LoadingSpinner } from '../components/ui/Loading';
 import { LoadingSkeleton } from '../components/ui/LoadingSkeleton';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { FlexibleContentCard } from '../components/FlexibleContentCard';
+import { VideoPlayer } from '../components/ui/VideoPlayer';
 import type { ContentWithUserData, FeedQueryParams } from '../types';
 
 export const HomePage: React.FC = () => {
@@ -19,6 +20,8 @@ export const HomePage: React.FC = () => {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [allContent, setAllContent] = useState<ContentWithUserData[]>([]);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [selectedVideo, setSelectedVideo] = useState<ContentWithUserData | null>(null);
+    const [isVideoPlayerOpen, setIsVideoPlayerOpen] = useState(false);
 
     const queryClient = useQueryClient();
 
@@ -44,6 +47,17 @@ export const HomePage: React.FC = () => {
         },
         onError: (error: any) => {
             toast.error(error.response?.data?.message || 'Failed to save content');
+        }
+    });
+
+    // View content mutation
+    const viewContentMutation = useMutation({
+        mutationFn: (contentId: string) => apiService.markContentAsViewed(contentId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['personalizedFeed'] });
+        },
+        onError: (error: any) => {
+            console.error('Failed to mark content as viewed:', error);
         }
     });
 
@@ -74,6 +88,31 @@ export const HomePage: React.FC = () => {
 
     const handleSaveContent = (contentId: string) => {
         saveContentMutation.mutate(contentId);
+    };
+
+    const handleContentClick = (content: ContentWithUserData) => {
+        // Mark as viewed if not already viewed
+        if (!content.userContent?.viewed) {
+            viewContentMutation.mutate(content._id);
+        }
+
+        // For video content, show in modal player
+        if (content.source === 'youtube' || content.url.includes('youtube.com') || content.url.includes('youtu.be')) {
+            setSelectedVideo(content);
+            setIsVideoPlayerOpen(true);
+        } else {
+            // For non-video content, open in new tab
+            if (content.url && content.url !== '#') {
+                window.open(content.url, '_blank');
+            } else {
+                toast.error('No URL available');
+            }
+        }
+    };
+
+    const closeVideoPlayer = () => {
+        setIsVideoPlayerOpen(false);
+        setSelectedVideo(null);
     };
 
     return (
@@ -211,7 +250,7 @@ export const HomePage: React.FC = () => {
                                         }}
                                         onLike={() => { }}
                                         onDismiss={() => { }}
-                                        onView={() => { }}
+                                        onView={handleContentClick}
                                         showDismiss={false}
                                     />
                                 ))}
@@ -241,6 +280,15 @@ export const HomePage: React.FC = () => {
                         </>
                     )}
                 </div>
+
+                {/* Video Player Modal */}
+                {selectedVideo && (
+                    <VideoPlayer
+                        content={selectedVideo}
+                        isOpen={isVideoPlayerOpen}
+                        onClose={closeVideoPlayer}
+                    />
+                )}
             </div>
         </ErrorBoundary>
     );

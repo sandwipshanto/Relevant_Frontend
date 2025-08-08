@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Search, TrendingUp, Filter, Hash, Clock, Grid, List, Flame } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { apiService } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { LoadingSkeleton } from '../components/ui/LoadingSkeleton';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { FlexibleContentCard } from '../components/FlexibleContentCard';
-import type { FeedQueryParams } from '../types';
+import { VideoPlayer } from '../components/ui/VideoPlayer';
+import type { FeedQueryParams, ContentWithUserData } from '../types';
 
 export const DiscoverPage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -18,6 +20,10 @@ export const DiscoverPage: React.FC = () => {
         limit: 18,
         minRelevance: 0.2 // Lower relevance for discovery
     });
+    const [selectedVideo, setSelectedVideo] = useState<ContentWithUserData | null>(null);
+    const [isVideoPlayerOpen, setIsVideoPlayerOpen] = useState(false);
+
+    const queryClient = useQueryClient();
 
     // Categories for discovery
     const categories = [
@@ -43,6 +49,29 @@ export const DiscoverPage: React.FC = () => {
         staleTime: 2 * 60 * 1000, // 2 minutes for discovery content
     });
 
+    // Save content mutation
+    const saveContentMutation = useMutation({
+        mutationFn: (contentId: string) => apiService.toggleContentSave(contentId, true),
+        onSuccess: () => {
+            toast.success('Content saved successfully!');
+            queryClient.invalidateQueries({ queryKey: ['discover'] });
+        },
+        onError: (error: any) => {
+            toast.error(error.response?.data?.message || 'Failed to save content');
+        }
+    });
+
+    // View content mutation
+    const viewContentMutation = useMutation({
+        mutationFn: (contentId: string) => apiService.markContentAsViewed(contentId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['discover'] });
+        },
+        onError: (error: any) => {
+            console.error('Failed to mark content as viewed:', error);
+        }
+    });
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         setFeedParams(prev => ({ ...prev, page: 1 }));
@@ -55,8 +84,32 @@ export const DiscoverPage: React.FC = () => {
     };
 
     const handleSaveContent = (contentId: string) => {
-        // This would trigger a save mutation similar to HomePage
-        console.log('Save content:', contentId);
+        saveContentMutation.mutate(contentId);
+    };
+
+    const handleContentClick = (content: ContentWithUserData) => {
+        // Mark as viewed if not already viewed
+        if (!content.userContent?.viewed) {
+            viewContentMutation.mutate(content._id);
+        }
+
+        // For video content, show in modal player
+        if (content.source === 'youtube' || content.url.includes('youtube.com') || content.url.includes('youtu.be')) {
+            setSelectedVideo(content);
+            setIsVideoPlayerOpen(true);
+        } else {
+            // For non-video content, open in new tab
+            if (content.url && content.url !== '#') {
+                window.open(content.url, '_blank');
+            } else {
+                toast.error('No URL available');
+            }
+        }
+    };
+
+    const closeVideoPlayer = () => {
+        setIsVideoPlayerOpen(false);
+        setSelectedVideo(null);
     };
 
     return (
@@ -221,7 +274,7 @@ export const DiscoverPage: React.FC = () => {
                                         }}
                                         onLike={() => { }}
                                         onDismiss={() => { }}
-                                        onView={() => { }}
+                                        onView={handleContentClick}
                                         showDismiss={false}
                                     />
                                 ))}
@@ -245,6 +298,15 @@ export const DiscoverPage: React.FC = () => {
                         </>
                     )}
                 </div>
+
+                {/* Video Player Modal */}
+                {selectedVideo && (
+                    <VideoPlayer
+                        content={selectedVideo}
+                        isOpen={isVideoPlayerOpen}
+                        onClose={closeVideoPlayer}
+                    />
+                )}
             </div>
         </ErrorBoundary>
     );

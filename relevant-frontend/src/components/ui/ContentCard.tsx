@@ -79,7 +79,10 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                 {/* Play Overlay */}
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="bg-white bg-opacity-90 rounded-full p-3 cursor-pointer transform scale-90 group-hover:scale-100 transition-transform duration-200">
+                        <div
+                            className="bg-white bg-opacity-90 rounded-full p-3 cursor-pointer transform scale-90 group-hover:scale-100 transition-transform duration-200"
+                            onClick={() => onView(content)}
+                        >
                             <Play className="h-6 w-6 text-gray-900" fill="currentColor" />
                         </div>
                     </div>
