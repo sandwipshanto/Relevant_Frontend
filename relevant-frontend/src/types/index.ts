@@ -96,11 +96,27 @@ export interface Content {
     tags: string[];
     category: string;
     summary: string;
-    highlights: string[];
+    highlights: string[] | ContentHighlight[];
     keyPoints: string[];
     relevantTopics: string[];
     processed: boolean;
     createdAt: string;
+
+    // NEW: Comprehensive AI Analysis fields
+    relevanceScore?: number;
+    categories?: string[];
+    complexity?: 'beginner' | 'intermediate' | 'advanced';
+    estimatedWatchTime?: string;
+    recommendationReason?: string;
+    sentiment?: 'positive' | 'neutral' | 'negative';
+}
+
+// Enhanced highlight structure from AI analysis
+export interface ContentHighlight {
+    text: string;
+    relevance: number;
+    reason: string;
+    timestamp?: number;
 }
 
 export interface UserContent {
@@ -137,6 +153,21 @@ export interface ContentHighlights {
         text: string;
         relevance: number;
     }>;
+}
+
+// Relevance filtering types
+export interface RelevanceFilter {
+    minRelevance: number;
+    maxRelevance: number;
+    sortBy: 'relevance' | 'date' | 'popularity';
+}
+
+export interface RelevanceStats {
+    avgRelevance: number;
+    minRelevance: number;
+    maxRelevance: number;
+    totalCount: number;
+    highRelevanceCount: number;
 }
 
 export interface SearchResults {

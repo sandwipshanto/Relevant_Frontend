@@ -115,6 +115,30 @@ class ApiService {
         return response.data;
     }
 
+    async getContentByRelevance(params: {
+        minRelevance?: number;
+        maxRelevance?: number;
+        page?: number;
+        limit?: number;
+        sortBy?: string;
+    } = {}): Promise<{
+        success: boolean;
+        content: ContentWithUserData[];
+        pagination: Pagination;
+        stats: any;
+        filters: any;
+    }> {
+        const queryParams = new URLSearchParams();
+        if (params.minRelevance !== undefined) queryParams.append('minRelevance', params.minRelevance.toString());
+        if (params.maxRelevance !== undefined) queryParams.append('maxRelevance', params.maxRelevance.toString());
+        if (params.page) queryParams.append('page', params.page.toString());
+        if (params.limit) queryParams.append('limit', params.limit.toString());
+        if (params.sortBy) queryParams.append('sortBy', params.sortBy);
+
+        const response = await this.api.get(`/api/content/by-relevance?${queryParams.toString()}`);
+        return response.data;
+    }
+
     async getContent(id: string): Promise<{ success: boolean; content: Content; userContent: UserContent }> {
         const response = await this.api.get(`/api/content/${id}`);
         return response.data;

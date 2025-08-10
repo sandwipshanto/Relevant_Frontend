@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, Filter, RefreshCw, X, Info, Clock, Zap, Grid, List } from 'lucide-react';
+import { Search, RefreshCw, X, Info, Clock, Zap, Grid, List } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { apiService } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
+import { RelevanceFilter } from '../components/ui/RelevanceFilter';
 import { LoadingSpinner } from '../components/ui/Loading';
 import { LoadingSkeleton } from '../components/ui/LoadingSkeleton';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { FlexibleContentCard } from '../components/FlexibleContentCard';
-import type { ContentWithUserData, FeedQueryParams } from '../types';
+import type { ContentWithUserData, FeedQueryParams, RelevanceFilter as RelevanceFilterType, RelevanceStats } from '../types';
 
 export const FeedPage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -22,6 +23,7 @@ export const FeedPage: React.FC = () => {
     const [allContent, setAllContent] = useState<ContentWithUserData[]>([]);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [relevanceStats, setRelevanceStats] = useState<RelevanceStats | undefined>();
 
     const queryClient = useQueryClient();
 
@@ -47,6 +49,24 @@ export const FeedPage: React.FC = () => {
         queryKey: ['searchContent', searchQuery, feedParams.page],
         queryFn: () => apiService.searchContent(searchQuery, feedParams.page || 1, feedParams.limit || 12),
         enabled: isSearchMode && searchQuery.length > 0,
+        staleTime: 30000
+    });
+
+    // Relevance filtering query
+    const {
+        data: relevanceData,
+        isLoading: relevanceLoading,
+        refetch: refetchRelevance
+    } = useQuery({
+        queryKey: ['contentByRelevance', feedParams],
+        queryFn: () => apiService.getContentByRelevance({
+            minRelevance: feedParams.minRelevance || 0,
+            maxRelevance: 1.0,
+            page: feedParams.page || 1,
+            limit: feedParams.limit || 12,
+            sortBy: 'relevance'
+        }),
+        enabled: false, // Only fetch when explicitly called
         staleTime: 30000
     });
 
@@ -143,6 +163,23 @@ export const FeedPage: React.FC = () => {
             viewMutation.mutate(content._id);
         }
         window.open(content.url, '_blank');
+    };
+
+    const handleRelevanceFilter = (filters: RelevanceFilterType) => {
+        setFeedParams(prev => ({
+            ...prev,
+            page: 1,
+            minRelevance: filters.minRelevance,
+            maxRelevance: filters.maxRelevance
+        }));
+        setAllContent([]);
+
+        // Trigger the relevance query
+        refetchRelevance().then((result) => {
+            if (result.data?.stats) {
+                setRelevanceStats(result.data.stats);
+            }
+        });
     };
 
     const currentData = isSearchMode ? searchData : feedData;
@@ -260,26 +297,13 @@ export const FeedPage: React.FC = () => {
                             )}
                         </form>
 
-                        {/* Filters */}
-                        <div className="flex flex-wrap gap-4 items-center text-sm text-gray-600 mt-4 pt-4 border-t">
-                            <div className="flex items-center gap-2">
-                                <Filter className="h-4 w-4" />
-                                <label className="font-medium">Relevance:</label>
-                                <select
-                                    value={feedParams.minRelevance}
-                                    onChange={(e) => {
-                                        setFeedParams(prev => ({ ...prev, minRelevance: parseFloat(e.target.value), page: 1 }));
-                                        setAllContent([]);
-                                    }}
-                                    className="border rounded-lg px-3 py-1 bg-white shadow-sm"
-                                >
-                                    <option value={0}>Any</option>
-                                    <option value={0.3}>30%+</option>
-                                    <option value={0.5}>50%+</option>
-                                    <option value={0.7}>70%+</option>
-                                    <option value={0.9}>90%+</option>
-                                </select>
-                            </div>
+                        {/* Advanced Relevance Filter */}
+                        <div className="mt-4 pt-4 border-t">
+                            <RelevanceFilter
+                                onFilterChange={handleRelevanceFilter}
+                                stats={relevanceStats}
+                                isLoading={relevanceLoading}
+                            />
                         </div>
                     </div>
                 </div>

@@ -58,6 +58,14 @@ export const FlexibleContentCard: React.FC<FlexibleContentCardProps> = ({
         relevantTopics: content.relevantTopics || [],
         processed: content.processed ?? true,
 
+        // NEW: Comprehensive AI Analysis data
+        relevanceScore: content.relevanceScore || content.userContent?.relevanceScore || 0,
+        categories: content.categories || [content.category || 'general'],
+        complexity: content.complexity || 'intermediate',
+        estimatedWatchTime: content.estimatedWatchTime || content.duration,
+        recommendationReason: content.recommendationReason || '',
+        sentiment: content.sentiment || 'neutral',
+
         // User interaction data
         userContent: content.userContent ? {
             _id: content.userContent._id || 'unknown',

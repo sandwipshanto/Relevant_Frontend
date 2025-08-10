@@ -56,7 +56,84 @@ export const ContentCard: React.FC<ContentCardProps> = ({
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group relative">
+            {/* Hover Tooltip for AI Analysis */}
+            <div className="absolute inset-x-0 top-full z-50 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto">
+                <div className="bg-white border border-gray-200 rounded-lg shadow-xl p-4 mx-4 mt-2">
+                    <div className="space-y-3">
+                        {/* Summary */}
+                        {content.summary && (
+                            <div>
+                                <h4 className="font-semibold text-gray-900 text-sm mb-1">Summary</h4>
+                                <p className="text-gray-700 text-xs leading-relaxed">{content.summary}</p>
+                            </div>
+                        )}
+
+                        {/* Key Highlights */}
+                        {content.highlights && Array.isArray(content.highlights) && content.highlights.length > 0 && (
+                            <div>
+                                <h4 className="font-semibold text-gray-900 text-sm mb-1">Key Highlights</h4>
+                                <ul className="space-y-1">
+                                    {content.highlights.slice(0, 3).map((highlight, index) => {
+                                        if (typeof highlight === 'string') {
+                                            return (
+                                                <li key={index} className="text-xs text-gray-700 flex items-start gap-2">
+                                                    <span className="text-blue-500 text-xs">•</span>
+                                                    <span>{highlight}</span>
+                                                </li>
+                                            );
+                                        } else if (typeof highlight === 'object' && highlight.text) {
+                                            return (
+                                                <li key={index} className="text-xs text-gray-700 flex items-start gap-2">
+                                                    <span className="text-blue-500 text-xs">•</span>
+                                                    <span>{highlight.text}</span>
+                                                    {highlight.relevance && (
+                                                        <span className="bg-blue-100 text-blue-700 px-1 py-0.5 rounded text-xs ml-auto">
+                                                            {Math.round(highlight.relevance * 100)}%
+                                                        </span>
+                                                    )}
+                                                </li>
+                                            );
+                                        }
+                                        return null;
+                                    })}
+                                </ul>
+                            </div>
+                        )}
+
+                        {/* Key Points */}
+                        {content.keyPoints && content.keyPoints.length > 0 && (
+                            <div>
+                                <h4 className="font-semibold text-gray-900 text-sm mb-1">Key Points</h4>
+                                <div className="flex flex-wrap gap-1">
+                                    {content.keyPoints.slice(0, 4).map((point, index) => (
+                                        <span key={index} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+                                            {point}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Additional Metadata */}
+                        <div className="flex flex-wrap gap-2 text-xs text-gray-600">
+                            {content.estimatedWatchTime && (
+                                <span>⏱️ {content.estimatedWatchTime}</span>
+                            )}
+                            {content.categories && content.categories.length > 0 && (
+                                <span>📂 {content.categories.slice(0, 2).join(', ')}</span>
+                            )}
+                        </div>
+
+                        {/* Recommendation Reason */}
+                        {content.recommendationReason && (
+                            <div className="bg-blue-50 border border-blue-200 rounded p-2">
+                                <p className="text-blue-800 text-xs font-medium">💡 {content.recommendationReason}</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
             {/* Thumbnail Container */}
             <div className="relative aspect-video bg-gray-100 overflow-hidden">
                 <img
@@ -73,6 +150,13 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                 {content.duration && typeof content.duration === 'number' && content.duration > 0 && (
                     <div className="absolute bottom-2 right-2 bg-black bg-opacity-80 text-white text-xs px-2 py-1 rounded font-medium">
                         {formatDuration(content.duration)}
+                    </div>
+                )}
+
+                {/* Relevance Score Badge */}
+                {(content.relevanceScore || content.userContent?.relevanceScore) && (
+                    <div className="absolute top-2 right-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
+                        {Math.round((content.relevanceScore || content.userContent?.relevanceScore || 0) * 100)}%
                     </div>
                 )}
 
@@ -100,11 +184,20 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                             ★ Saved
                         </div>
                     )}
+                    {/* Complexity Badge */}
+                    {content.complexity && (
+                        <div className={`text-white text-xs px-2 py-0.5 rounded-full font-medium shadow-sm ${content.complexity === 'beginner' ? 'bg-green-500' :
+                                content.complexity === 'intermediate' ? 'bg-yellow-500' :
+                                    'bg-red-500'
+                            }`}>
+                            {content.complexity}
+                        </div>
+                    )}
                 </div>
 
                 {/* Dismiss Button */}
                 {showDismiss && onDismiss && (
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <Button
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -197,6 +290,25 @@ export const ContentCard: React.FC<ContentCardProps> = ({
                         {content.userContent.matchedInterests.filter(interest => typeof interest === 'string').length > 3 && (
                             <span className="text-xs text-gray-500 px-2 py-1">
                                 +{content.userContent.matchedInterests.filter(interest => typeof interest === 'string').length - 3} more
+                            </span>
+                        )}
+                    </div>
+                )}
+
+                {/* AI Analysis Categories */}
+                {content.categories && content.categories.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                        {content.categories.slice(0, 3).map((category, index) => (
+                            <span
+                                key={index}
+                                className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"
+                            >
+                                📁 {category}
+                            </span>
+                        ))}
+                        {content.categories.length > 3 && (
+                            <span className="text-xs text-gray-500 px-2 py-1">
+                                +{content.categories.length - 3} more
                             </span>
                         )}
                     </div>
