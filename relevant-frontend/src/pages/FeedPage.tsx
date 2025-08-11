@@ -54,7 +54,6 @@ export const FeedPage: React.FC = () => {
 
     // Relevance filtering query
     const {
-        data: relevanceData,
         isLoading: relevanceLoading,
         refetch: refetchRelevance
     } = useQuery({
