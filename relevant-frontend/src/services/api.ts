@@ -29,7 +29,7 @@ class ApiService {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         console.log('🔧 API Base URL:', apiUrl);
         console.log('🔧 Environment vars:', import.meta.env);
-        
+
         this.api = axios.create({
             baseURL: apiUrl,
             headers: {
